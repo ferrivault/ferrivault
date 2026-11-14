@@ -56,6 +56,8 @@ pub struct TokenResponse {
     pub kdf_memory: Option<u32>,
     #[serde(alias = "KdfParallelism", alias = "kdfParallelism")]
     pub kdf_parallelism: Option<u32>,
+    #[serde(alias = "TwoFactorToken", alias = "twoFactorToken")]
+    pub two_factor_token: Option<String>,
 }
 
 /// Queries `/identity/accounts/prelogin` (falling back to `/api/accounts/prelogin`)
@@ -128,6 +130,14 @@ async fn send_token_form(
     Ok((status, raw_body))
 }
 
+/// Optional verification codes or remembered 2FA token passed to [`login_with_password`].
+#[derive(Debug, Default, Clone, Copy)]
+pub struct VerificationParams<'a> {
+    pub two_factor_token: Option<&'a str>,
+    pub new_device_otp: Option<&'a str>,
+    pub remembered_two_factor_token: Option<&'a str>,
+}
+
 /// Authenticates against `POST /identity/connect/token` using `grant_type=password`.
 ///
 /// Supports:
@@ -140,8 +150,7 @@ pub async fn login_with_password(
     email: &str,
     master_password_hash: &str,
     device_id: &str,
-    two_factor_token: Option<&str>,
-    new_device_otp: Option<&str>,
+    verification: VerificationParams<'_>,
 ) -> Result<TokenResponse, AppError> {
     let url = format!("{}/connect/token", endpoints.identity_url);
     let auth_email_b64 = base64::Engine::encode(
@@ -161,7 +170,11 @@ pub async fn login_with_password(
         ("deviceName", "Rustwarden Desktop".to_string()),
     ];
 
-    if let Some(otp) = new_device_otp.map(str::trim).filter(|s| !s.is_empty()) {
+    if let Some(otp) = verification
+        .new_device_otp
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
         base_form.push(("newDeviceOtp", otp.to_string()));
         let (status, raw_body) = send_token_form(client, &url, &auth_email_b64, &base_form).await?;
         if status.is_success() {
@@ -172,11 +185,15 @@ pub async fn login_with_password(
         return Err(parse_token_failure(status, &raw_body));
     }
 
-    if let Some(code) = two_factor_token.map(str::trim).filter(|s| !s.is_empty()) {
+    if let Some(code) = verification
+        .two_factor_token
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
         let mut form_totp = base_form.clone();
         form_totp.push(("twoFactorToken", code.to_string()));
         form_totp.push(("twoFactorProvider", "0".to_string()));
-        form_totp.push(("twoFactorRemember", "0".to_string()));
+        form_totp.push(("twoFactorRemember", "1".to_string()));
 
         let (status, raw_body) = send_token_form(client, &url, &auth_email_b64, &form_totp).await?;
         if status.is_success() {
@@ -189,7 +206,7 @@ pub async fn login_with_password(
         let mut form_email = base_form;
         form_email.push(("twoFactorToken", code.to_string()));
         form_email.push(("twoFactorProvider", "1".to_string()));
-        form_email.push(("twoFactorRemember", "0".to_string()));
+        form_email.push(("twoFactorRemember", "1".to_string()));
         let (status_email, body_email) =
             send_token_form(client, &url, &auth_email_b64, &form_email).await?;
         if status_email.is_success() {
@@ -199,6 +216,25 @@ pub async fn login_with_password(
         }
 
         return Err(parse_token_failure(status, &raw_body));
+    }
+
+    // If we have a remembered 2FA token (provider 5) for this device, try it first
+    if let Some(rem_token) = verification
+        .remembered_two_factor_token
+        .map(str::trim)
+        .filter(|s| !s.is_empty())
+    {
+        let mut form_rem = base_form.clone();
+        form_rem.push(("twoFactorToken", rem_token.to_string()));
+        form_rem.push(("twoFactorProvider", "5".to_string()));
+        form_rem.push(("twoFactorRemember", "1".to_string()));
+        let (status_rem, body_rem) =
+            send_token_form(client, &url, &auth_email_b64, &form_rem).await?;
+        if status_rem.is_success() {
+            return serde_json::from_str::<TokenResponse>(&body_rem).map_err(|e| {
+                AppError::Network(format!("Failed to parse token response JSON: {e}"))
+            });
+        }
     }
 
     // Step 1: No verification code provided yet
@@ -211,6 +247,46 @@ pub async fn login_with_password(
     }
 
     Err(parse_token_failure(status, &raw_body))
+}
+
+/// Refreshes an expired `access_token` using a persisted `refresh_token`.
+pub async fn refresh_access_token(
+    client: &Client,
+    endpoints: &ServerEndpoints,
+    refresh_token: &str,
+) -> Result<(String, Option<String>), AppError> {
+    #[derive(Deserialize)]
+    struct RefreshResp {
+        access_token: String,
+        refresh_token: Option<String>,
+    }
+
+    let url = format!("{}/connect/token", endpoints.identity_url);
+    let form = [
+        ("grant_type", "refresh_token"),
+        ("client_id", "desktop"),
+        ("refresh_token", refresh_token),
+    ];
+
+    let response = client
+        .post(&url)
+        .header("Device-Type", "8")
+        .header("Bitwarden-Client-Name", BITWARDEN_CLIENT_NAME)
+        .header("Bitwarden-Client-Version", BITWARDEN_CLIENT_VERSION)
+        .form(&form)
+        .send()
+        .await?;
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let text = response.text().await.unwrap_or_default();
+        return Err(AppError::InvalidCredentials(format!(
+            "Session token refresh failed ({status}): {text}"
+        )));
+    }
+
+    let parsed = response.json::<RefreshResp>().await?;
+    Ok((parsed.access_token, parsed.refresh_token))
 }
 
 /// Parses a failed `/identity/connect/token` response into a descriptive [`AppError`].

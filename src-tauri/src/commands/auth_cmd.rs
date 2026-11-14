@@ -6,7 +6,7 @@ use serde::Deserialize;
 use tauri::State;
 
 use crate::api::{
-    auth::{fetch_prelogin, login_with_password},
+    auth::{fetch_prelogin, login_with_password, refresh_access_token, VerificationParams},
     endpoints::{ServerEndpoints, ServerRegion},
     sync::{fetch_sync, SyncResponse},
 };
@@ -156,16 +156,31 @@ pub async fn login(
     let password_hash = derive_master_password_hash(&master_key, &payload.master_password);
     let stretched_key = stretch_master_key(&master_key)?;
 
+    let remembered_tf = {
+        let tf_guard = state.two_factor_tokens.read().await;
+        tf_guard.get(&email).cloned()
+    };
+
     let token_resp = login_with_password(
         &state.http_client,
         &endpoints,
         &email,
         &password_hash,
         &state.device_id,
-        payload.two_factor_code.as_deref(),
-        payload.new_device_otp.as_deref(),
+        VerificationParams {
+            two_factor_token: payload.two_factor_code.as_deref(),
+            new_device_otp: payload.new_device_otp.as_deref(),
+            remembered_two_factor_token: remembered_tf.as_deref(),
+        },
     )
     .await?;
+
+    if let Some(ref tf_tok) = token_resp.two_factor_token {
+        if !tf_tok.trim().is_empty() {
+            let mut tf_guard = state.two_factor_tokens.write().await;
+            tf_guard.insert(email.clone(), tf_tok.clone());
+        }
+    }
 
     let sync_resp = fetch_sync(&state.http_client, &endpoints, &token_resp.access_token).await?;
 
@@ -193,18 +208,22 @@ pub async fn login(
         kdf_parallelism: token_resp.kdf_parallelism.or(kdf_params.kdf_parallelism),
     };
 
-    let mut session_guard = state.session.write().await;
-    *session_guard = Some(SessionData {
-        email,
-        endpoints,
-        kdf_params: effective_kdf,
-        access_token: token_resp.access_token,
-        refresh_token: token_resp.refresh_token,
-        protected_symmetric_key: protected_key,
-        last_encrypted_sync: Some(sync_resp),
-        vault_key: Some(vault_key),
-        decrypted_snapshot: Some(snapshot.clone()),
-    });
+    {
+        let mut session_guard = state.session.write().await;
+        *session_guard = Some(SessionData {
+            email,
+            endpoints,
+            kdf_params: effective_kdf,
+            access_token: token_resp.access_token,
+            refresh_token: token_resp.refresh_token,
+            protected_symmetric_key: protected_key,
+            last_encrypted_sync: Some(sync_resp),
+            vault_key: Some(vault_key),
+            decrypted_snapshot: Some(snapshot.clone()),
+        });
+    }
+
+    state.persist().await;
 
     Ok(snapshot)
 }
@@ -220,35 +239,63 @@ pub async fn unlock_vault(
         return Err(AppError::Validation("Master Password is required".into()));
     }
 
-    let mut session_guard = state.session.write().await;
-    let session = session_guard.as_mut().ok_or(AppError::VaultLocked)?;
+    let mut token_refreshed = false;
+    let snapshot = {
+        let mut session_guard = state.session.write().await;
+        let session = session_guard.as_mut().ok_or(AppError::VaultLocked)?;
 
-    let master_key = derive_master_key(&master_password, &session.email, &session.kdf_params)?;
-    let stretched_key = stretch_master_key(&master_key)?;
-    let vault_key = decrypt_vault_key(&session.protected_symmetric_key, &stretched_key)?;
+        let master_key = derive_master_key(&master_password, &session.email, &session.kdf_params)?;
+        let stretched_key = stretch_master_key(&master_key)?;
+        let vault_key = decrypt_vault_key(&session.protected_symmetric_key, &stretched_key)?;
 
-    let sync_resp = match &session.last_encrypted_sync {
-        Some(cached) => cached.clone(),
-        None => {
-            fetch_sync(
+        let sync_resp = match &session.last_encrypted_sync {
+            Some(cached) => cached.clone(),
+            None => match fetch_sync(
                 &state.http_client,
                 &session.endpoints,
                 &session.access_token,
             )
-            .await?
-        }
+            .await
+            {
+                Ok(resp) => resp,
+                Err(first_err) => {
+                    let Some(ref refresh_tok) = session.refresh_token.clone() else {
+                        return Err(first_err);
+                    };
+                    let (new_access, new_refresh) =
+                        refresh_access_token(&state.http_client, &session.endpoints, refresh_tok)
+                            .await?;
+                    session.access_token = new_access;
+                    if let Some(nr) = new_refresh {
+                        session.refresh_token = Some(nr);
+                    }
+                    token_refreshed = true;
+                    fetch_sync(
+                        &state.http_client,
+                        &session.endpoints,
+                        &session.access_token,
+                    )
+                    .await?
+                }
+            },
+        };
+
+        let snapshot = decrypt_sync_response(
+            &session.email,
+            &session.endpoints.base_url,
+            &sync_resp,
+            &vault_key,
+        );
+
+        session.last_encrypted_sync = Some(sync_resp);
+        session.vault_key = Some(vault_key);
+        session.decrypted_snapshot = Some(snapshot.clone());
+        snapshot
     };
 
-    let snapshot = decrypt_sync_response(
-        &session.email,
-        &session.endpoints.base_url,
-        &sync_resp,
-        &vault_key,
-    );
-
-    session.last_encrypted_sync = Some(sync_resp);
-    session.vault_key = Some(vault_key);
-    session.decrypted_snapshot = Some(snapshot.clone());
+    if token_refreshed {
+        state.persist().await;
+    }
 
     Ok(snapshot)
 }
@@ -263,13 +310,16 @@ pub async fn lock_vault(state: State<'_, AppState>) -> Result<(), AppError> {
     Ok(())
 }
 
-/// Logs out completely, clearing all tokens, keys, and cached vault data from memory.
+/// Logs out completely, clearing all tokens, keys, and cached vault data from memory and disk.
 #[tauri::command]
 pub async fn logout(state: State<'_, AppState>) -> Result<(), AppError> {
-    let mut session_guard = state.session.write().await;
-    if let Some(mut session) = session_guard.take() {
-        session.lock();
+    {
+        let mut session_guard = state.session.write().await;
+        if let Some(mut session) = session_guard.take() {
+            session.lock();
+        }
     }
+    state.persist().await;
     Ok(())
 }
 

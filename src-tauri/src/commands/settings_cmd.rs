@@ -20,8 +20,11 @@ pub async fn update_settings(
     state: State<'_, AppState>,
 ) -> Result<AppSettings, AppError> {
     state.set_close_to_tray(new_settings.close_to_tray);
-    let mut guard = state.settings.write().await;
-    *guard = new_settings.clone();
+    {
+        let mut guard = state.settings.write().await;
+        *guard = new_settings.clone();
+    }
+    state.persist().await;
     Ok(new_settings)
 }
 
