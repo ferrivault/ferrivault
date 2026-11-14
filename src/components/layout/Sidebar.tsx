@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Building2Icon,
   CheckIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
   CreditCardIcon,
   FileTextIcon,
   FolderIcon,
@@ -18,18 +21,27 @@ import {
   StarIcon,
   Trash2Icon,
   UserCheckIcon,
+  UserIcon,
+  VaultIcon,
   XIcon,
 } from "@animateicons/react/lucide";
 import { parseBackendError } from "../../lib/utils";
 import { useAuthStore } from "../../stores/authStore";
 import { useVaultStore } from "../../stores/vaultStore";
-import type { VaultFilter } from "../../types/vault";
+import {
+  isCipherInVaultScope,
+  type VaultFilter,
+  type VaultScope,
+} from "../../types/vault";
 
 export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuthStore();
   const ciphers = useVaultStore((s) => s.ciphers);
   const folders = useVaultStore((s) => s.folders);
+  const organizations = useVaultStore((s) => s.organizations);
+  const vaultScope = useVaultStore((s) => s.vaultScope);
+  const setVaultScope = useVaultStore((s) => s.setVaultScope);
   const filter = useVaultStore((s) => s.filter);
   const setFilter = useVaultStore((s) => s.setFilter);
   const isSyncing = useVaultStore((s) => s.isSyncing);
@@ -43,10 +55,42 @@ export const Sidebar: React.FC = () => {
 
   const [isAddingFolder, setIsAddingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [isVaultTreeOpen, setIsVaultTreeOpen] = useState(true);
 
-  const activeCiphers = ciphers.filter((c) => !c.deletedDate);
-  const trashCount = ciphers.filter((c) => Boolean(c.deletedDate)).length;
+  const allActiveCiphers = ciphers.filter((c) => !c.deletedDate);
+  const scopedCiphers = ciphers.filter((c) =>
+    isCipherInVaultScope(c, vaultScope)
+  );
+  const activeCiphers = scopedCiphers.filter((c) => !c.deletedDate);
+  const trashCount = scopedCiphers.filter((c) => Boolean(c.deletedDate)).length;
   const favCount = activeCiphers.filter((c) => c.favorite).length;
+
+  const visibleFolders = folders.filter((folder) => {
+    if (vaultScope.kind === "all") return true;
+    const countInScope = activeCiphers.filter(
+      (c) => c.folderId === folder.id
+    ).length;
+    if (countInScope > 0) return true;
+    // Keep newly created empty folders visible in My Vault if they have no items in any vault
+    if (vaultScope.kind === "myVault") {
+      const countAcrossAllVaults = allActiveCiphers.filter(
+        (c) => c.folderId === folder.id
+      ).length;
+      return countAcrossAllVaults === 0;
+    }
+    return false;
+  });
+
+  const isScopeSelected = (candidate: VaultScope): boolean => {
+    if (vaultScope.kind !== candidate.kind) return false;
+    if (
+      vaultScope.kind === "organization" &&
+      candidate.kind === "organization"
+    ) {
+      return vaultScope.organizationId === candidate.organizationId;
+    }
+    return true;
+  };
 
   const isSelected = (candidate: VaultFilter): boolean => {
     if (filter.kind !== candidate.kind) return false;
@@ -130,6 +174,109 @@ export const Sidebar: React.FC = () => {
 
       {/* Navigation List */}
       <div className="flex-1 space-y-5 overflow-y-auto px-3 py-4 text-xs">
+        {/* Vaults Tree Selector */}
+        <div>
+          <div className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+            {t("sidebar.vaultsHeader")}
+          </div>
+
+          <div className="space-y-1">
+            {/* Root Node: All Vaults */}
+            <div
+              className={`flex items-center justify-between rounded-lg px-2 py-1.5 font-medium transition ${
+                isScopeSelected({ kind: "all" })
+                  ? "bg-brand-600/20 text-brand-300"
+                  : "text-slate-300 hover:bg-slate-800/60"
+              }`}
+            >
+              <div className="flex min-w-0 flex-1 items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setIsVaultTreeOpen((v) => !v)}
+                  className="rounded p-0.5 text-slate-400 hover:bg-slate-700/60 hover:text-white"
+                >
+                  {isVaultTreeOpen ? (
+                    <ChevronDownIcon size={14} />
+                  ) : (
+                    <ChevronRightIcon size={14} />
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVaultScope({ kind: "all" })}
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                >
+                  <VaultIcon size={15} className="shrink-0 text-brand-400" />
+                  <span className="truncate">{t("sidebar.allVaults")}</span>
+                </button>
+              </div>
+              <span className="ml-1 text-[10px] text-slate-500">
+                {allActiveCiphers.length}
+              </span>
+            </div>
+
+            {/* Child Nodes: My Vault + Organization Vaults */}
+            {isVaultTreeOpen && (
+              <div className="ml-3.5 space-y-1 border-l border-slate-800 pl-2.5">
+                <button
+                  type="button"
+                  onClick={() => setVaultScope({ kind: "myVault" })}
+                  className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 font-medium transition ${
+                    isScopeSelected({ kind: "myVault" })
+                      ? "bg-brand-600/20 text-brand-300"
+                      : "text-slate-300 hover:bg-slate-800/60"
+                  }`}
+                >
+                  <span className="flex min-w-0 items-center gap-2 truncate">
+                    <UserIcon size={14} className="shrink-0 text-emerald-400" />
+                    <span className="truncate">{t("sidebar.myVault")}</span>
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    {allActiveCiphers.filter((c) => !c.organizationId).length}
+                  </span>
+                </button>
+
+                {organizations.map((org) => {
+                  const orgCount = allActiveCiphers.filter(
+                    (c) => c.organizationId === org.id
+                  ).length;
+                  return (
+                    <button
+                      key={org.id}
+                      type="button"
+                      onClick={() =>
+                        setVaultScope({
+                          kind: "organization",
+                          organizationId: org.id,
+                        })
+                      }
+                      className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 font-medium transition ${
+                        isScopeSelected({
+                          kind: "organization",
+                          organizationId: org.id,
+                        })
+                          ? "bg-brand-600/20 text-brand-300"
+                          : "text-slate-300 hover:bg-slate-800/60"
+                      }`}
+                    >
+                      <span className="flex min-w-0 items-center gap-2 truncate">
+                        <Building2Icon
+                          size={14}
+                          className="shrink-0 text-amber-400"
+                        />
+                        <span className="truncate">{org.name}</span>
+                      </span>
+                      <span className="text-[10px] text-slate-500">
+                        {orgCount}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
         {/* Primary Views */}
         <div className="space-y-1">
           <button
@@ -276,7 +423,7 @@ export const Sidebar: React.FC = () => {
           )}
 
           <div className="space-y-1">
-            {folders.map((folder) => {
+            {visibleFolders.map((folder) => {
               const count = activeCiphers.filter(
                 (c) => c.folderId === folder.id
               ).length;

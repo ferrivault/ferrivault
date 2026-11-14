@@ -12,11 +12,13 @@ import {
 } from "@animateicons/react/lucide";
 import { extractHostname } from "../../lib/utils";
 import { useVaultStore } from "../../stores/vaultStore";
-import type { CipherView } from "../../types/vault";
+import { isCipherInVaultScope, type CipherView } from "../../types/vault";
 
 export const CipherList: React.FC = () => {
   const { t } = useTranslation();
   const ciphers = useVaultStore((s) => s.ciphers);
+  const organizations = useVaultStore((s) => s.organizations);
+  const vaultScope = useVaultStore((s) => s.vaultScope);
   const filter = useVaultStore((s) => s.filter);
   const searchQuery = useVaultStore((s) => s.searchQuery);
   const setSearchQuery = useVaultStore((s) => s.setSearchQuery);
@@ -28,6 +30,8 @@ export const CipherList: React.FC = () => {
     const q = searchQuery.trim().toLowerCase();
 
     return ciphers.filter((cipher) => {
+      if (!isCipherInVaultScope(cipher, vaultScope)) return false;
+
       const isTrashed = Boolean(cipher.deletedDate);
 
       if (filter.kind === "trash") {
@@ -57,7 +61,7 @@ export const CipherList: React.FC = () => {
 
       return nameMatch || userMatch || uriMatch || cardMatch || notesMatch;
     });
-  }, [ciphers, filter, searchQuery]);
+  }, [ciphers, vaultScope, filter, searchQuery]);
 
   const getSecondaryText = (cipher: CipherView): string => {
     if (cipher.type === 1) {
@@ -145,6 +149,9 @@ export const CipherList: React.FC = () => {
           filteredCiphers.map((cipher) => {
             const selected = cipher.id === selectedCipherId;
             const subtitle = getSecondaryText(cipher);
+            const orgName = cipher.organizationId
+              ? organizations.find((o) => o.id === cipher.organizationId)?.name
+              : null;
 
             return (
               <button
@@ -171,6 +178,11 @@ export const CipherList: React.FC = () => {
                         size={12}
                         className="shrink-0 text-amber-400"
                       />
+                    )}
+                    {orgName && (
+                      <span className="shrink-0 rounded bg-amber-500/15 px-1.5 py-0.5 text-[9px] font-medium text-amber-300">
+                        {orgName}
+                      </span>
                     )}
                   </div>
                   {subtitle && (

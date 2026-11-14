@@ -66,6 +66,9 @@
     "loggedInAs": "Signed in as {{email}}"
   },
   "sidebar": {
+    "vaultsHeader": "Vaults",
+    "allVaults": "All Vaults",
+    "myVault": "My Vault",
     "allItems": "All Items",
     "favorites": "Favorites",
     "trash": "Trash",

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  Building2Icon,
   CopyIcon,
   ExternalLinkIcon,
   EyeIcon,
@@ -11,6 +12,7 @@ import {
   SquarePenIcon,
   StarIcon,
   Trash2Icon,
+  UserIcon,
 } from "@animateicons/react/lucide";
 import { apiCopyToClipboard, apiOpenExternalUrl } from "../../lib/tauri";
 import { formatCardNumber, parseBackendError } from "../../lib/utils";
@@ -109,6 +111,7 @@ export const CipherDetail: React.FC = () => {
   const { t } = useTranslation();
   const ciphers = useVaultStore((s) => s.ciphers);
   const folders = useVaultStore((s) => s.folders);
+  const organizations = useVaultStore((s) => s.organizations);
   const selectedCipherId = useVaultStore((s) => s.selectedCipherId);
   const startEditCipher = useVaultStore((s) => s.startEditCipher);
   const softDeleteCipher = useVaultStore((s) => s.softDeleteCipher);
@@ -140,6 +143,10 @@ export const CipherDetail: React.FC = () => {
   const folderName =
     folders.find((f) => f.id === cipher.folderId)?.name ??
     t("sidebar.noFolder");
+  const orgName = cipher.organizationId
+    ? (organizations.find((o) => o.id === cipher.organizationId)?.name ??
+      cipher.organizationId)
+    : null;
   const isTrashed = Boolean(cipher.deletedDate);
 
   const handleSoftDelete = async () => {
@@ -191,9 +198,25 @@ export const CipherDetail: React.FC = () => {
               <StarIcon size={16} className="text-amber-400" />
             )}
           </div>
-          <div className="mt-1.5 flex items-center gap-2 text-xs text-slate-400">
-            <FolderIcon size={14} />
-            <span>{folderName}</span>
+          <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+            <span className="flex items-center gap-1.5">
+              {orgName ? (
+                <>
+                  <Building2Icon size={14} className="text-amber-400" />
+                  <span className="text-amber-300">{orgName}</span>
+                </>
+              ) : (
+                <>
+                  <UserIcon size={14} className="text-emerald-400" />
+                  <span>{t("sidebar.myVault")}</span>
+                </>
+              )}
+            </span>
+            <span className="text-slate-700">•</span>
+            <span className="flex items-center gap-1.5">
+              <FolderIcon size={14} />
+              <span>{folderName}</span>
+            </span>
           </div>
         </div>
 

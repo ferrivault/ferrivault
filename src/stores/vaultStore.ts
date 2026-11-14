@@ -8,12 +8,15 @@ import {
   apiSaveFolder,
   apiSyncVault,
 } from "../lib/tauri";
-import type {
-  CipherTypeNumber,
-  CipherView,
-  FolderView,
-  VaultFilter,
-  VaultSnapshot,
+import {
+  isCipherInVaultScope,
+  type CipherTypeNumber,
+  type CipherView,
+  type FolderView,
+  type OrganizationView,
+  type VaultFilter,
+  type VaultScope,
+  type VaultSnapshot,
 } from "../types/vault";
 
 export interface ToastMessage {
@@ -25,6 +28,8 @@ export interface ToastMessage {
 interface VaultState {
   ciphers: CipherView[];
   folders: FolderView[];
+  organizations: OrganizationView[];
+  vaultScope: VaultScope;
   filter: VaultFilter;
   searchQuery: string;
   selectedCipherId: string | null;
@@ -39,6 +44,7 @@ interface VaultState {
 
   setSnapshot: (snapshot: VaultSnapshot) => void;
   clearVaultMemory: () => void;
+  setVaultScope: (scope: VaultScope) => void;
   setFilter: (filter: VaultFilter) => void;
   setSearchQuery: (query: string) => void;
   selectCipher: (id: string | null) => void;
@@ -66,11 +72,12 @@ interface VaultState {
 
 export function createBlankCipher(
   cipherType: CipherTypeNumber = 1,
-  folderId: string | null = null
+  folderId: string | null = null,
+  organizationId: string | null = null
 ): CipherView {
   return {
     id: "",
-    organizationId: null,
+    organizationId,
     folderId,
     type: cipherType,
     name: "",
@@ -125,6 +132,8 @@ export function createBlankCipher(
 export const useVaultStore = create<VaultState>((set, get) => ({
   ciphers: [],
   folders: [],
+  organizations: [],
+  vaultScope: { kind: "all" },
   filter: { kind: "all" },
   searchQuery: "",
   selectedCipherId: null,
@@ -146,6 +155,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
     set((state) => ({
       ciphers: snapshot.ciphers,
       folders: snapshot.folders,
+      organizations: snapshot.organizations ?? [],
       lastSyncedAt: now,
       selectedCipherId:
         state.selectedCipherId &&
@@ -159,9 +169,42 @@ export const useVaultStore = create<VaultState>((set, get) => ({
     set({
       ciphers: [],
       folders: [],
+      organizations: [],
+      vaultScope: { kind: "all" },
       selectedCipherId: null,
       editingCipher: null,
       isCreatingCipher: false,
+    });
+  },
+
+  setVaultScope: (vaultScope) => {
+    set((state) => {
+      const scopedCiphers = state.ciphers.filter((c) =>
+        isCipherInVaultScope(c, vaultScope)
+      );
+      let nextFilter = state.filter;
+      if (state.filter.kind === "folder" && state.filter.folderId !== null) {
+        const targetFolderId = state.filter.folderId;
+        const folderHasScopedItems = scopedCiphers.some(
+          (c) => !c.deletedDate && c.folderId === targetFolderId
+        );
+        if (!folderHasScopedItems && vaultScope.kind !== "all") {
+          nextFilter = { kind: "all" };
+        }
+      }
+      const currentStillVisible = scopedCiphers.some(
+        (c) => c.id === state.selectedCipherId
+      );
+      const firstActive = scopedCiphers.find((c) => !c.deletedDate);
+      return {
+        vaultScope,
+        filter: nextFilter,
+        selectedCipherId: currentStillVisible
+          ? state.selectedCipherId
+          : (firstActive?.id ?? null),
+        editingCipher: null,
+        isCreatingCipher: false,
+      };
     });
   },
 
@@ -187,15 +230,22 @@ export const useVaultStore = create<VaultState>((set, get) => ({
 
   startCreateCipher: (defaultType) => {
     const currentFilter = get().filter;
+    const currentScope = get().vaultScope;
     const inferredType: CipherTypeNumber =
       defaultType ??
       (currentFilter.kind === "type" ? currentFilter.cipherType : 1);
     const inferredFolder =
       currentFilter.kind === "folder" ? currentFilter.folderId : null;
+    const inferredOrg =
+      currentScope.kind === "organization" ? currentScope.organizationId : null;
 
     set({
       isCreatingCipher: true,
-      editingCipher: createBlankCipher(inferredType, inferredFolder),
+      editingCipher: createBlankCipher(
+        inferredType,
+        inferredFolder,
+        inferredOrg
+      ),
     });
   },
 

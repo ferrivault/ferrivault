@@ -78,11 +78,31 @@ export interface FolderView {
   revisionDate?: string | null;
 }
 
+export interface OrganizationView {
+  id: string;
+  name: string;
+}
+
 export interface VaultSnapshot {
   email: string;
   serverUrl: string;
   ciphers: CipherView[];
   folders: FolderView[];
+  organizations: OrganizationView[];
+}
+
+export type VaultScope =
+  | { kind: "all" }
+  | { kind: "myVault" }
+  | { kind: "organization"; organizationId: string };
+
+export function isCipherInVaultScope(
+  cipher: CipherView,
+  scope: VaultScope
+): boolean {
+  if (scope.kind === "all") return true;
+  if (scope.kind === "myVault") return !cipher.organizationId;
+  return cipher.organizationId === scope.organizationId;
 }
 
 export interface TotpResponse {

@@ -36,6 +36,14 @@ impl Default for AppSettings {
     }
 }
 
+/// Organization vault summary exposed to the React frontend.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct OrganizationView {
+    pub id: String,
+    pub name: String,
+}
+
 /// Complete decrypted vault snapshot sent to the React frontend.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -44,6 +52,7 @@ pub struct VaultSnapshot {
     pub server_url: String,
     pub ciphers: Vec<CipherView>,
     pub folders: Vec<FolderView>,
+    pub organizations: Vec<OrganizationView>,
 }
 
 /// Session state that survives locking (encrypted tokens & KDF params),

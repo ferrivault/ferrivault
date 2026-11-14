@@ -16,7 +16,7 @@ use crate::crypto::{
     keys::SymmetricCryptoKey,
 };
 use crate::error::AppError;
-use crate::state::{AppState, AuthStatus, SessionData, VaultSnapshot};
+use crate::state::{AppState, AuthStatus, OrganizationView, SessionData, VaultSnapshot};
 
 /// Login request payload sent from the React login view.
 #[derive(Debug, Deserialize)]
@@ -96,6 +96,28 @@ pub fn decrypt_sync_response(
     }
     folders.sort_by_key(|a| a.name.to_lowercase());
 
+    let mut organizations = Vec::new();
+    if let Some(profile) = &sync_resp.profile {
+        for org in &profile.organizations {
+            if !org.enabled {
+                continue;
+            }
+            if let Some(id) = org.id.as_deref().filter(|s| !s.is_empty()) {
+                let name = org
+                    .name
+                    .as_deref()
+                    .filter(|s| !s.trim().is_empty())
+                    .unwrap_or("Organization")
+                    .to_string();
+                organizations.push(OrganizationView {
+                    id: id.to_string(),
+                    name,
+                });
+            }
+        }
+    }
+    organizations.sort_by_key(|a| a.name.to_lowercase());
+
     let mut ciphers = Vec::new();
     for enc_cipher in &sync_resp.ciphers {
         if let Ok(cipher) = enc_cipher.decrypt_with_org_keys(vault_key, &org_keys) {
@@ -109,6 +131,7 @@ pub fn decrypt_sync_response(
         server_url: server_url.to_string(),
         ciphers,
         folders,
+        organizations,
     }
 }
 

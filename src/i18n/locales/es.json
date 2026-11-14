@@ -66,6 +66,9 @@
     "loggedInAs": "Sesión iniciada como {{email}}"
   },
   "sidebar": {
+    "vaultsHeader": "Bóvedas",
+    "allVaults": "Todas las bóvedas",
+    "myVault": "Mi bóveda",
     "allItems": "Todos los elementos",
     "favorites": "Favoritos",
     "trash": "Papelera",

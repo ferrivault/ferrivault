@@ -66,6 +66,9 @@
     "loggedInAs": "Sessió iniciada com a {{email}}"
   },
   "sidebar": {
+    "vaultsHeader": "Caixes fortes",
+    "allVaults": "Totes les caixes fortes",
+    "myVault": "La meva caixa forta",
     "allItems": "Tots els elements",
     "favorites": "Preferits",
     "trash": "Paperera",
