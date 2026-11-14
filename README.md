@@ -85,3 +85,11 @@ Detailed technical documentation is located in the [`doc/`](./doc/README.md) dir
 - [Cryptography & Security Model](./doc/cryptography.md)
 - [Internationalization & Localization Guide (i18n)](./doc/i18n.md)
 - [Development & Build Guide](./doc/development.md)
+
+---
+
+## License
+
+Copyright (C) 2026 Victor Guardiola
+
+This program is free software: you can redistribute it and/or modify it under the terms of the **GNU General Public License v3.0** as published by the Free Software Foundation. See the [`LICENSE`](./LICENSE) file for the full license text.

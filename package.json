@@ -2,6 +2,8 @@
   "name": "ferrivault",
   "private": true,
   "version": "0.1.0",
+  "license": "GPL-3.0-only",
+  "author": "Victor Guardiola",
   "description": "Fast, secure cross-platform desktop client for Bitwarden and Vaultwarden built with Tauri v2 and Rust",
   "type": "module",
   "scripts": {
