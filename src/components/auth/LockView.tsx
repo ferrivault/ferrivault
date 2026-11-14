@@ -7,6 +7,7 @@ import {
   LockIcon,
   LockOpenIcon,
   LogOutIcon,
+  SettingsIcon,
 } from "@animateicons/react/lucide";
 import { parseBackendError } from "../../lib/utils";
 import { useAuthStore } from "../../stores/authStore";
@@ -17,6 +18,7 @@ export const LockView: React.FC = () => {
   const auth = useAuthStore();
   const setSnapshot = useVaultStore((s) => s.setSnapshot);
   const clearVaultMemory = useVaultStore((s) => s.clearVaultMemory);
+  const openSettings = useVaultStore((s) => s.openSettings);
 
   const [masterPassword, setMasterPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +53,17 @@ export const LockView: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen items-center justify-center bg-slate-950 p-6 text-slate-100">
+    <div className="relative flex h-screen w-screen items-center justify-center bg-slate-950 p-6 text-slate-100">
+      <button
+        type="button"
+        onClick={openSettings}
+        title={t("sidebar.settings")}
+        className="absolute right-6 top-6 flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs font-medium text-slate-300 transition hover:border-slate-700 hover:text-white"
+      >
+        <SettingsIcon size={15} />
+        <span>{t("sidebar.settings")}</span>
+      </button>
+
       <div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/80 p-7 shadow-2xl">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-600/20 text-brand-400">
           <LockIcon size={24} />

@@ -84,7 +84,10 @@ export const CipherList: React.FC = () => {
   };
 
   return (
-    <section className="flex h-full w-80 shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/60">
+    <section
+      style={{ width: "var(--rw-list-width, 320px)" }}
+      className="flex h-full shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/60"
+    >
       {/* Search & New Button Header */}
       <div className="flex items-center gap-2 border-b border-slate-800/80 p-3">
         <div className="relative flex-1">

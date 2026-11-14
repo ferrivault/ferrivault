@@ -10,6 +10,7 @@ import {
   MailCheckIcon,
   MailIcon,
   ServerIcon,
+  SettingsIcon,
   ShieldCheckIcon,
 } from "@animateicons/react/lucide";
 import { SUPPORTED_LOCALES } from "../../i18n/config";
@@ -74,6 +75,7 @@ export const LoginView: React.FC = () => {
   const { t } = useTranslation();
   const auth = useAuthStore();
   const setSnapshot = useVaultStore((s) => s.setSnapshot);
+  const openSettings = useVaultStore((s) => s.openSettings);
   const locale = useSettingsStore((s) => s.locale);
   const changeLanguage = useSettingsStore((s) => s.changeLanguage);
 
@@ -213,24 +215,35 @@ export const LoginView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5">
-          <GlobeIcon size={16} className="text-slate-400" />
-          <select
-            aria-label={t("settings.languageLabel")}
-            value={locale}
-            onChange={(e) => void changeLanguage(e.target.value)}
-            className="bg-slate-900 text-xs font-medium text-slate-100 focus:outline-none"
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5">
+            <GlobeIcon size={16} className="text-slate-400" />
+            <select
+              aria-label={t("settings.languageLabel")}
+              value={locale}
+              onChange={(e) => void changeLanguage(e.target.value)}
+              className="bg-slate-900 text-xs font-medium text-slate-100 focus:outline-none"
+            >
+              {SUPPORTED_LOCALES.map((loc) => (
+                <option
+                  key={loc.code}
+                  value={loc.code}
+                  className="bg-slate-900 text-slate-100"
+                >
+                  {loc.nativeName} ({loc.code.toUpperCase()})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="button"
+            onClick={openSettings}
+            title={t("sidebar.settings")}
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-800 bg-slate-900 text-slate-300 transition hover:border-slate-700 hover:text-white"
           >
-            {SUPPORTED_LOCALES.map((loc) => (
-              <option
-                key={loc.code}
-                value={loc.code}
-                className="bg-slate-900 text-slate-100"
-              >
-                {loc.nativeName} ({loc.code.toUpperCase()})
-              </option>
-            ))}
-          </select>
+            <SettingsIcon size={16} />
+          </button>
         </div>
       </div>
 

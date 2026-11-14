@@ -37,6 +37,7 @@ export default function App(): React.ReactElement {
   const isSettingsOpen = useVaultStore((s) => s.isSettingsOpen);
   const openGenerator = useVaultStore((s) => s.openGenerator);
   const closeGenerator = useVaultStore((s) => s.closeGenerator);
+  const openSettings = useVaultStore((s) => s.openSettings);
   const closeSettings = useVaultStore((s) => s.closeSettings);
   const startCreateCipher = useVaultStore((s) => s.startCreateCipher);
   const syncVault = useVaultStore((s) => s.syncVault);
@@ -103,8 +104,6 @@ export default function App(): React.ReactElement {
 
   // Global Application Keyboard Shortcuts
   useEffect(() => {
-    if (!isLoggedIn || isLocked) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         if (isGeneratorOpen) {
@@ -123,6 +122,15 @@ export default function App(): React.ReactElement {
       if (!isMod) return;
 
       const key = e.key.toLowerCase();
+
+      // Ctrl/Cmd + , -> Open Settings & Preferences
+      if (key === ",") {
+        e.preventDefault();
+        openSettings();
+        return;
+      }
+
+      if (!isLoggedIn || isLocked) return;
 
       // Ctrl/Cmd + F or Ctrl/Cmd + K -> Focus search bar
       if (key === "f" || key === "k") {
@@ -178,6 +186,7 @@ export default function App(): React.ReactElement {
     isGeneratorOpen,
     isSettingsOpen,
     closeGenerator,
+    openSettings,
     closeSettings,
     clearVaultMemory,
     lock,

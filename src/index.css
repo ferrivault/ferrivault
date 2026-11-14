@@ -3,15 +3,52 @@
 @tailwind utilities;
 
 @layer base {
-  html {
+  :root {
+    --rw-brand-50: 239 246 255;
+    --rw-brand-100: 219 234 254;
+    --rw-brand-200: 191 219 254;
+    --rw-brand-300: 147 197 253;
+    --rw-brand-400: 96 165 250;
+    --rw-brand-500: 59 130 246;
+    --rw-brand-600: 23 93 220;
+    --rw-brand-700: 29 78 216;
+    --rw-brand-800: 30 64 175;
+    --rw-brand-900: 30 58 138;
+
+    --rw-slate-50: 248 250 252;
+    --rw-slate-100: 241 245 249;
+    --rw-slate-200: 226 232 240;
+    --rw-slate-300: 203 213 225;
+    --rw-slate-400: 148 163 184;
+    --rw-slate-500: 100 116 139;
+    --rw-slate-600: 71 85 105;
+    --rw-slate-700: 51 65 85;
+    --rw-slate-800: 30 41 59;
+    --rw-slate-900: 15 23 42;
+    --rw-slate-950: 2 6 23;
+
+    --rw-font-size: 16px;
+    --rw-radius: 12px;
+    --rw-sidebar-width: 240px;
+    --rw-list-width: 320px;
+
     color-scheme: dark;
   }
 
   select,
   option {
-    color-scheme: dark;
-    background-color: #090d16;
-    color: #f1f5f9;
+    background-color: rgb(var(--rw-slate-950));
+    color: rgb(var(--rw-slate-100));
+  }
+
+  /* Ensure light themes keep headings legible while preserving white text inside accent buttons */
+  html[data-color-scheme="light"] .text-white:not(.bg-brand-600):not(.bg-red-600) {
+    color: rgb(var(--rw-slate-100));
+  }
+  html[data-color-scheme="light"] .bg-brand-600,
+  html[data-color-scheme="light"] .bg-red-600,
+  html[data-color-scheme="light"] .bg-brand-600 .text-white {
+    color: #ffffff;
   }
 
   ::-webkit-scrollbar {
@@ -24,11 +61,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.25);
+    background: rgb(var(--rw-slate-400) / 0.25);
     border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.45);
+    background: rgb(var(--rw-slate-400) / 0.45);
   }
 }

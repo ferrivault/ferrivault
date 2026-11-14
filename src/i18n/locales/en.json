@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Rustwarden",
+    "name": "FerriVault",
     "tagline": "Secure Desktop Client for Bitwarden & Vaultwarden",
     "version": "v0.1.0"
   },
@@ -203,6 +203,13 @@
   },
   "settings": {
     "title": "Settings & Preferences",
+    "subtitle": "Configure security timeouts, color themes, UI sizing, and application language",
+    "tabs": {
+      "security": "Security",
+      "appearance": "Themes & Sizing",
+      "language": "Language",
+      "system": "System & Shortcuts"
+    },
     "languageSection": "Language & Localization",
     "languageLabel": "Application Language",
     "languageHelp": "All translations are stored in src/i18n/locales/*.json. Community contributors can easily add new languages.",
@@ -215,6 +222,9 @@
     "clipboard1m": "1 minute",
     "clipboard2m": "2 minutes",
     "autoLockLabel": "Vault Auto-Lock Timeout",
+    "autoLockHelp": "Automatically lock the vault and wipe keys from memory after a period of inactivity.",
+    "autoLockCustomMinutes": "Custom timeout",
+    "minutesUnit": "minutes (0 = never)",
     "autoLockNever": "Never",
     "autoLock5m": "5 minutes",
     "autoLock15m": "15 minutes",
@@ -222,19 +232,36 @@
     "autoLock1h": "1 hour",
     "showFaviconsLabel": "Show website icons (favicons)",
     "showFaviconsDesc": "Fetch domain icons from the Bitwarden/Vaultwarden icon service for Login items.",
+    "themesSection": "Color Themes",
+    "themeDark": "Dark",
+    "themeLight": "Light",
+    "customThemeTitle": "Custom Themes & JSON Template",
+    "customThemeDesc": "Download the JSON template based on your current theme, edit the hex colors (#RRGGBB) or pixel sizes, and upload it to install your own custom theme.",
+    "downloadThemeTemplate": "Download JSON Template",
+    "uploadCustomTheme": "Upload Theme (.json)",
+    "themeTemplateDownloaded": "Theme template downloaded (ferrivault-theme-template.json)",
+    "themeImportSuccess": "Theme \"{{name}}\" imported and applied",
+    "themeImportError": "Invalid theme JSON file. Please check its format.",
+    "sizingSection": "Interface Dimensions & Typography",
+    "resetSizing": "Reset Defaults",
+    "fontSizeLabel": "Base Font Size",
+    "borderRadiusLabel": "Corner Roundness",
+    "sidebarWidthLabel": "Sidebar Width",
+    "listWidthLabel": "Item List Width",
+    "shortcutsTitle": "Keyboard Shortcuts",
     "traySection": "System Tray Integration",
     "closeToTrayLabel": "Minimize to System Tray when closing window",
-    "closeToTrayDesc": "Keep Rustwarden running in the OS notification bar when clicking the close button.",
+    "closeToTrayDesc": "Keep FerriVault running in the OS notification bar when clicking the close button.",
     "startMinimizedLabel": "Start minimized in System Tray",
-    "aboutSection": "About Rustwarden",
-    "aboutDescription": "Rustwarden is an open, memory-safe desktop client for Bitwarden and Vaultwarden powered by Tauri v2 and RustCrypto."
+    "aboutSection": "About FerriVault",
+    "aboutDescription": "FerriVault is an open, memory-safe desktop client for Bitwarden and Vaultwarden powered by Tauri v2 and RustCrypto."
   },
   "tray": {
-    "showWindow": "Show / Hide Rustwarden",
+    "showWindow": "Show / Hide FerriVault",
     "openGenerator": "Password Generator",
     "syncVault": "Sync Vault Now",
     "lockVault": "Lock Vault",
-    "quit": "Quit Rustwarden"
+    "quit": "Quit FerriVault"
   },
   "notifications": {
     "copied": "{{field}} copied to clipboard",

@@ -182,7 +182,10 @@ export const Sidebar: React.FC = () => {
   };
 
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-slate-800/80 bg-slate-900/70 select-none">
+    <aside
+      style={{ width: "var(--rw-sidebar-width, 240px)" }}
+      className="flex h-full shrink-0 flex-col border-r border-slate-800/80 bg-slate-900/70 select-none"
+    >
       {/* Brand Header */}
       <div className="flex items-center justify-between border-b border-slate-800/80 px-4 py-3.5">
         <div className="flex items-center gap-2.5 overflow-hidden">
@@ -196,6 +199,15 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={openSettings}
+          title={t("sidebar.settings")}
+          className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-white"
+        >
+          <SettingsIcon size={16} />
+        </button>
       </div>
 
       {/* Navigation List */}

@@ -17,6 +17,10 @@ fn default_true() -> bool {
     true
 }
 
+fn default_theme_id() -> String {
+    "ferrivault-dark".to_string()
+}
+
 /// User preferences managed in backend state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -27,11 +31,17 @@ pub struct AppSettings {
     pub clipboard_clear_seconds: u64,
     /// Minutes of inactivity before locking the vault (`0` = never).
     pub auto_lock_minutes: u64,
-    /// Whether closing the main window minimizes Rustwarden to the system tray instead of quitting.
+    /// Whether closing the main window minimizes FerriVault to the system tray instead of quitting.
     pub close_to_tray: bool,
     /// Whether to display website favicons for Login items in the vault list and detail view.
     #[serde(default = "default_true")]
     pub show_favicons: bool,
+    /// Active UI theme identifier (built-in or custom uploaded theme).
+    #[serde(default = "default_theme_id")]
+    pub active_theme_id: String,
+    /// Serialized JSON array of user-uploaded custom themes persisted on disk.
+    #[serde(default)]
+    pub custom_themes_json: String,
 }
 
 impl Default for AppSettings {
@@ -42,6 +52,8 @@ impl Default for AppSettings {
             auto_lock_minutes: 15,
             close_to_tray: true,
             show_favicons: true,
+            active_theme_id: default_theme_id(),
+            custom_themes_json: "[]".to_string(),
         }
     }
 }
@@ -126,7 +138,7 @@ pub struct PersistedSession {
     pub protected_symmetric_key: String,
 }
 
-/// On-disk state persisted in `~/.config/rustwarden/state.json`.
+/// On-disk state persisted in `~/.config/ferrivault/state.json`.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PersistedAppState {
@@ -142,18 +154,18 @@ pub struct PersistedAppState {
 fn state_file_path() -> PathBuf {
     if let Ok(xdg) = std::env::var("XDG_CONFIG_HOME") {
         if !xdg.trim().is_empty() {
-            return PathBuf::from(xdg).join("rustwarden").join("state.json");
+            return PathBuf::from(xdg).join("ferrivault").join("state.json");
         }
     }
     if let Ok(home) = std::env::var("HOME") {
         if !home.trim().is_empty() {
             return PathBuf::from(home)
                 .join(".config")
-                .join("rustwarden")
+                .join("ferrivault")
                 .join("state.json");
         }
     }
-    PathBuf::from("/tmp/rustwarden-state.json")
+    PathBuf::from("/tmp/ferrivault-state.json")
 }
 
 fn load_or_init_persisted_state() -> PersistedAppState {

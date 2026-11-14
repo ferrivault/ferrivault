@@ -4,6 +4,8 @@ export interface AppSettings {
   autoLockMinutes: number;
   closeToTray: boolean;
   showFavicons: boolean;
+  activeThemeId: string;
+  customThemesJson: string;
 }
 
 export interface TrayMenuLabels {

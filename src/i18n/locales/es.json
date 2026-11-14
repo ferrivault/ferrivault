@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Rustwarden",
+    "name": "FerriVault",
     "tagline": "Cliente de escritorio seguro para Bitwarden y Vaultwarden",
     "version": "v0.1.0"
   },
@@ -203,6 +203,13 @@
   },
   "settings": {
     "title": "Ajustes y preferencias",
+    "subtitle": "Configura tiempos de autobloqueo, temas de color, tamaños de interfaz e idioma",
+    "tabs": {
+      "security": "Seguridad",
+      "appearance": "Temas y Tamaños",
+      "language": "Idioma",
+      "system": "Sistema y Atajos"
+    },
     "languageSection": "Idioma y localización",
     "languageLabel": "Idioma de la aplicación",
     "languageHelp": "Todas las traducciones se encuentran en src/i18n/locales/*.json. Cualquier colaborador puede añadir nuevos idiomas fácilmente.",
@@ -215,6 +222,9 @@
     "clipboard1m": "1 minuto",
     "clipboard2m": "2 minutos",
     "autoLockLabel": "Tiempo de autobloqueo de la bóveda",
+    "autoLockHelp": "Bloquea automáticamente la bóveda y borra las claves de la memoria tras un periodo de inactividad.",
+    "autoLockCustomMinutes": "Tiempo personalizado",
+    "minutesUnit": "minutos (0 = nunca)",
     "autoLockNever": "Nunca",
     "autoLock5m": "5 minutos",
     "autoLock15m": "15 minutos",
@@ -222,19 +232,36 @@
     "autoLock1h": "1 hora",
     "showFaviconsLabel": "Mostrar iconos de sitios web (favicons)",
     "showFaviconsDesc": "Carga los iconos de dominio desde el servicio de iconos de Bitwarden/Vaultwarden en los inicios de sesión.",
+    "themesSection": "Temas de colores",
+    "themeDark": "Oscuro",
+    "themeLight": "Claro",
+    "customThemeTitle": "Temas personalizados y plantilla JSON",
+    "customThemeDesc": "Descarga la plantilla JSON basada en tu tema actual, cambia los colores hexadecimales (#RRGGBB) o los tamaños en píxeles, y súbela para instalar tu propio tema.",
+    "downloadThemeTemplate": "Descargar plantilla JSON",
+    "uploadCustomTheme": "Subir tema (.json)",
+    "themeTemplateDownloaded": "Plantilla descargada (ferrivault-theme-template.json)",
+    "themeImportSuccess": "Tema «{{name}}» importado y aplicado",
+    "themeImportError": "Archivo JSON de tema no válido. Revisa su formato.",
+    "sizingSection": "Dimensiones y tipografía de la interfaz",
+    "resetSizing": "Restablecer valores",
+    "fontSizeLabel": "Tamaño de fuente base",
+    "borderRadiusLabel": "Redondeo de esquinas",
+    "sidebarWidthLabel": "Ancho de barra lateral",
+    "listWidthLabel": "Ancho de lista de elementos",
+    "shortcutsTitle": "Atajos de teclado",
     "traySection": "Integración con la bandeja del sistema",
     "closeToTrayLabel": "Minimizar a la bandeja del sistema al cerrar la ventana",
-    "closeToTrayDesc": "Mantiene Rustwarden activo en la barra del sistema al pulsar el botón de cerrar.",
+    "closeToTrayDesc": "Mantiene FerriVault activo en la barra del sistema al pulsar el botón de cerrar.",
     "startMinimizedLabel": "Iniciar minimizado en la bandeja del sistema",
-    "aboutSection": "Acerca de Rustwarden",
-    "aboutDescription": "Rustwarden es un cliente de escritorio libre y seguro en memoria para Bitwarden y Vaultwarden construido con Tauri v2 y RustCrypto."
+    "aboutSection": "Acerca de FerriVault",
+    "aboutDescription": "FerriVault es un cliente de escritorio libre y seguro en memoria para Bitwarden y Vaultwarden construido con Tauri v2 y RustCrypto."
   },
   "tray": {
-    "showWindow": "Mostrar / Ocultar Rustwarden",
+    "showWindow": "Mostrar / Ocultar FerriVault",
     "openGenerator": "Generador de contraseñas",
     "syncVault": "Sincronizar bóveda ahora",
     "lockVault": "Bloquear bóveda",
-    "quit": "Salir de Rustwarden"
+    "quit": "Salir de FerriVault"
   },
   "notifications": {
     "copied": "{{field}} copiado al portapapeles",

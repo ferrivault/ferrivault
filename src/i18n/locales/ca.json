@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Rustwarden",
+    "name": "FerriVault",
     "tagline": "Client d'escriptori segur per a Bitwarden i Vaultwarden",
     "version": "v0.1.0"
   },
@@ -203,6 +203,13 @@
   },
   "settings": {
     "title": "Configuració i preferències",
+    "subtitle": "Configura el temps d'autobloqueig, els temes de color, les mides de la interfície i l'idioma",
+    "tabs": {
+      "security": "Seguretat",
+      "appearance": "Temes i Mides",
+      "language": "Idioma",
+      "system": "Sistema i Dreceres"
+    },
     "languageSection": "Idioma i localització",
     "languageLabel": "Idioma de l'aplicació",
     "languageHelp": "Totes les traduccions es desaran a src/i18n/locales/*.json. Qualsevol col·laborador pot afegir nous idiomes fàcilment.",
@@ -215,6 +222,9 @@
     "clipboard1m": "1 minut",
     "clipboard2m": "2 minuts",
     "autoLockLabel": "Temps d'autobloqueig de la caixa forta",
+    "autoLockHelp": "Bloqueja automàticament la caixa forta i esborra les claus de la memòria després d'un període d'inactivitat.",
+    "autoLockCustomMinutes": "Temps personalitzat",
+    "minutesUnit": "minuts (0 = mai)",
     "autoLockNever": "Mai",
     "autoLock5m": "5 minuts",
     "autoLock15m": "15 minuts",
@@ -222,19 +232,36 @@
     "autoLock1h": "1 hora",
     "showFaviconsLabel": "Mostra les icones dels llocs web (favicons)",
     "showFaviconsDesc": "Carrega les icones de domini des del servei d'icones de Bitwarden/Vaultwarden als inicis de sessió.",
+    "themesSection": "Temes de colors",
+    "themeDark": "Fosc",
+    "themeLight": "Clar",
+    "customThemeTitle": "Temes personalitzats i plantilla JSON",
+    "customThemeDesc": "Baixa la plantilla JSON basada en el teu tema actual, canvia els colors hexadecimals (#RRGGBB) o les mides en píxels, i puja-la per instal·lar el teu propi tema.",
+    "downloadThemeTemplate": "Baixa la plantilla JSON",
+    "uploadCustomTheme": "Puja un tema (.json)",
+    "themeTemplateDownloaded": "Plantilla baixada (ferrivault-theme-template.json)",
+    "themeImportSuccess": "Tema «{{name}}» importat i aplicat",
+    "themeImportError": "Fitxer JSON de tema no vàlid. Revisa'n el format.",
+    "sizingSection": "Dimensions i tipografia de la interfície",
+    "resetSizing": "Restableix els valors",
+    "fontSizeLabel": "Mida de la lletra base",
+    "borderRadiusLabel": "Arrodoniment de les cantonades",
+    "sidebarWidthLabel": "Amplada de la barra lateral",
+    "listWidthLabel": "Amplada de la llista d'elements",
+    "shortcutsTitle": "Dreceres de teclat",
     "traySection": "Integració amb la safata del sistema",
     "closeToTrayLabel": "Minimitza a la safata del sistema en tancar la finestra",
-    "closeToTrayDesc": "Manté el Rustwarden actiu a la barra del sistema en prémer el botó de tancar.",
+    "closeToTrayDesc": "Manté el FerriVault actiu a la barra del sistema en prémer el botó de tancar.",
     "startMinimizedLabel": "Inicia minimitzat a la safata del sistema",
-    "aboutSection": "Quant a Rustwarden",
-    "aboutDescription": "Rustwarden és un client d'escriptori lliure i segur en memòria per a Bitwarden i Vaultwarden construït amb Tauri v2 i RustCrypto."
+    "aboutSection": "Quant a FerriVault",
+    "aboutDescription": "FerriVault és un client d'escriptori lliure i segur en memòria per a Bitwarden i Vaultwarden construït amb Tauri v2 i RustCrypto."
   },
   "tray": {
-    "showWindow": "Mostra / Amaga Rustwarden",
+    "showWindow": "Mostra / Amaga FerriVault",
     "openGenerator": "Generador de contrasenyes",
     "syncVault": "Sincronitza la caixa forta ara",
     "lockVault": "Bloqueja la caixa forta",
-    "quit": "Surt de Rustwarden"
+    "quit": "Surt de FerriVault"
   },
   "notifications": {
     "copied": "{{field}} copiat al porta-retalls",
