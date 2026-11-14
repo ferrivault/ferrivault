@@ -1,0 +1,23 @@
+name: Translation or Theme Contribution
+description: Propose a new UI language translation or built-in color theme
+title: "[i18n / Theme]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Contribution Type
+      options:
+        - New Language Translation (i18n)
+        - Translation Fix / Improvement
+        - New Built-in Color Theme
+    validations:
+      required: true
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Specify the locale code (e.g. `fr`, `de`, `pt-BR`) or theme name, and attach or link the JSON file if ready.
+    validations:
+      required: true
