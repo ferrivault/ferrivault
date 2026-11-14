@@ -18,6 +18,7 @@ import { apiCopyToClipboard, apiOpenExternalUrl } from "../../lib/tauri";
 import { formatCardNumber, parseBackendError } from "../../lib/utils";
 import { useVaultStore } from "../../stores/vaultStore";
 import { TotpBadge } from "../tools/TotpBadge";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 interface DetailFieldProps {
   label: string;
@@ -120,7 +121,9 @@ export const CipherDetail: React.FC = () => {
   const pushToast = useVaultStore((s) => s.pushToast);
 
   const [revealCardNumber, setRevealCardNumber] = useState(false);
+  const [confirmingSoftDelete, setConfirmingSoftDelete] = useState(false);
   const [confirmingPermDelete, setConfirmingPermDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const cipher = ciphers.find((c) => c.id === selectedCipherId);
 
@@ -150,12 +153,16 @@ export const CipherDetail: React.FC = () => {
   const isTrashed = Boolean(cipher.deletedDate);
 
   const handleSoftDelete = async () => {
+    setIsDeleting(true);
     try {
       await softDeleteCipher(cipher.id);
+      setConfirmingSoftDelete(false);
       pushToast(t("notifications.itemDeleted"), "info");
     } catch (err) {
       const parsed = parseBackendError(err);
       pushToast(parsed.message, "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -170,6 +177,7 @@ export const CipherDetail: React.FC = () => {
   };
 
   const handlePermanentDelete = async () => {
+    setIsDeleting(true);
     try {
       await permanentDeleteCipher(cipher.id);
       setConfirmingPermDelete(false);
@@ -177,6 +185,8 @@ export const CipherDetail: React.FC = () => {
     } catch (err) {
       const parsed = parseBackendError(err);
       pushToast(parsed.message, "error");
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -235,7 +245,7 @@ export const CipherDetail: React.FC = () => {
 
               <button
                 type="button"
-                onClick={() => void handleSoftDelete()}
+                onClick={() => setConfirmingSoftDelete(true)}
                 title={t("vault.moveToTrash")}
                 className="flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-950/30 px-3 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-900/40"
               >
@@ -254,33 +264,14 @@ export const CipherDetail: React.FC = () => {
                 {t("vault.restoreItem")}
               </button>
 
-              {confirmingPermDelete ? (
-                <div className="flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => void handlePermanentDelete()}
-                    className="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-500"
-                  >
-                    {t("common.confirm")}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setConfirmingPermDelete(false)}
-                    className="rounded-lg border border-slate-700 px-2.5 py-1.5 text-xs text-slate-300"
-                  >
-                    {t("common.cancel")}
-                  </button>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setConfirmingPermDelete(true)}
-                  className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-950/40 px-3 py-1.5 text-xs font-medium text-red-300 hover:bg-red-900/50"
-                >
-                  <Trash2Icon size={14} />
-                  {t("vault.permanentDelete")}
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => setConfirmingPermDelete(true)}
+                className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-950/40 px-3 py-1.5 text-xs font-medium text-red-300 hover:bg-red-900/50"
+              >
+                <Trash2Icon size={14} />
+                {t("vault.permanentDelete")}
+              </button>
             </>
           )}
         </div>
@@ -511,6 +502,30 @@ export const CipherDetail: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Soft Delete (Move to Trash) Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmingSoftDelete}
+        title={t("vault.deleteItemTitle")}
+        description={t("vault.confirmMoveToTrash", { name: cipher.name })}
+        confirmLabel={t("vault.moveToTrash")}
+        isLoading={isDeleting}
+        onConfirm={() => void handleSoftDelete()}
+        onCancel={() => setConfirmingSoftDelete(false)}
+      />
+
+      {/* Permanent Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={confirmingPermDelete}
+        title={t("vault.permanentDeleteTitle")}
+        description={t("vault.confirmPermanentDeleteNamed", {
+          name: cipher.name,
+        })}
+        confirmLabel={t("vault.permanentDelete")}
+        isLoading={isDeleting}
+        onConfirm={() => void handlePermanentDelete()}
+        onCancel={() => setConfirmingPermDelete(false)}
+      />
     </div>
   );
 };

@@ -30,9 +30,11 @@ import { useAuthStore } from "../../stores/authStore";
 import { useVaultStore } from "../../stores/vaultStore";
 import {
   isCipherInVaultScope,
+  type FolderView,
   type VaultFilter,
   type VaultScope,
 } from "../../types/vault";
+import { ConfirmDialog } from "../ui/ConfirmDialog";
 
 export const Sidebar: React.FC = () => {
   const { t } = useTranslation();
@@ -56,6 +58,9 @@ export const Sidebar: React.FC = () => {
   const [isAddingFolder, setIsAddingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [isVaultTreeOpen, setIsVaultTreeOpen] = useState(true);
+  const [pendingDeleteFolder, setPendingDeleteFolder] =
+    useState<FolderView | null>(null);
+  const [isDeletingFolder, setIsDeletingFolder] = useState(false);
 
   const allActiveCiphers = ciphers.filter((c) => !c.deletedDate);
   const scopedCiphers = ciphers.filter((c) =>
@@ -133,14 +138,23 @@ export const Sidebar: React.FC = () => {
     }
   };
 
-  const handleDeleteFolder = async (id: string, e: React.MouseEvent) => {
+  const requestDeleteFolder = (folder: FolderView, e: React.MouseEvent) => {
     e.stopPropagation();
+    setPendingDeleteFolder(folder);
+  };
+
+  const confirmDeleteFolder = async () => {
+    if (!pendingDeleteFolder) return;
+    setIsDeletingFolder(true);
     try {
-      await deleteFolder(id);
+      await deleteFolder(pendingDeleteFolder.id);
+      setPendingDeleteFolder(null);
       pushToast(t("notifications.folderDeleted"), "info");
     } catch (err) {
       const parsed = parseBackendError(err);
       pushToast(parsed.message, "error");
+    } finally {
+      setIsDeletingFolder(false);
     }
   };
 
@@ -447,7 +461,7 @@ export const Sidebar: React.FC = () => {
                     <span className="text-[10px] text-slate-500">{count}</span>
                     <button
                       type="button"
-                      onClick={(e) => void handleDeleteFolder(folder.id, e)}
+                      onClick={(e) => requestDeleteFolder(folder, e)}
                       title={t("sidebar.deleteFolder")}
                       className="hidden rounded p-0.5 text-slate-500 hover:text-red-400 group-hover:inline-block"
                     >
@@ -541,6 +555,33 @@ export const Sidebar: React.FC = () => {
           <LogOutIcon size={16} />
         </button>
       </div>
+
+      <ConfirmDialog
+        isOpen={Boolean(pendingDeleteFolder)}
+        title={t("sidebar.deleteFolderTitle")}
+        description={t("sidebar.deleteFolderConfirm", {
+          name: pendingDeleteFolder?.name ?? "",
+        })}
+        warningText={
+          pendingDeleteFolder
+            ? (() => {
+                const folderItemCount = ciphers.filter(
+                  (c) =>
+                    !c.deletedDate && c.folderId === pendingDeleteFolder.id
+                ).length;
+                return folderItemCount > 0
+                  ? t("sidebar.deleteFolderNonEmptyWarning", {
+                      count: folderItemCount,
+                    })
+                  : null;
+              })()
+            : null
+        }
+        confirmLabel={t("common.delete")}
+        isLoading={isDeletingFolder}
+        onConfirm={() => void confirmDeleteFolder()}
+        onCancel={() => setPendingDeleteFolder(null)}
+      />
     </aside>
   );
 };
