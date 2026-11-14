@@ -13,12 +13,13 @@ pub async fn get_settings(state: State<'_, AppState>) -> Result<AppSettings, App
     Ok(guard.clone())
 }
 
-/// Updates the backend settings (clipboard timeout, auto-lock, close-to-tray, locale).
+/// Updates the backend settings (clipboard timeout, auto-lock, close-to-tray, autostart, locale).
 #[tauri::command]
 pub async fn update_settings(
     new_settings: AppSettings,
     state: State<'_, AppState>,
 ) -> Result<AppSettings, AppError> {
+    crate::autostart::set_autostart(new_settings.launch_at_startup, new_settings.start_minimized)?;
     state.set_close_to_tray(new_settings.close_to_tray);
     {
         let mut guard = state.settings.write().await;

@@ -60,6 +60,8 @@ function loadPersistedSettings(): AppSettings {
     showFavicons: true,
     activeThemeId: DEFAULT_THEME.id,
     customThemesJson: "[]",
+    launchAtStartup: false,
+    startMinimized: false,
   };
   try {
     const raw = localStorage.getItem(LOCAL_SETTINGS_KEY);
@@ -139,6 +141,8 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       showFavicons: partial.showFavicons ?? current.showFavicons,
       activeThemeId: partial.activeThemeId ?? current.activeThemeId,
       customThemesJson: partial.customThemesJson ?? current.customThemesJson,
+      launchAtStartup: partial.launchAtStartup ?? current.launchAtStartup,
+      startMinimized: partial.startMinimized ?? current.startMinimized,
     };
 
     const customThemes =

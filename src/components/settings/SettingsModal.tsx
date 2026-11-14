@@ -42,6 +42,8 @@ export const SettingsModal: React.FC = () => {
   );
   const autoLockMinutes = useSettingsStore((s) => s.autoLockMinutes);
   const closeToTray = useSettingsStore((s) => s.closeToTray);
+  const launchAtStartup = useSettingsStore((s) => s.launchAtStartup);
+  const startMinimized = useSettingsStore((s) => s.startMinimized);
   const showFavicons = useSettingsStore((s) => s.showFavicons);
   const activeThemeId = useSettingsStore((s) => s.activeThemeId);
   const customThemes = useSettingsStore((s) => s.customThemes);
@@ -633,24 +635,68 @@ export const SettingsModal: React.FC = () => {
                     <span>{t("settings.traySection")}</span>
                   </div>
 
-                  <label className="flex cursor-pointer items-start gap-2.5 text-slate-300">
-                    <input
-                      type="checkbox"
-                      checked={closeToTray}
-                      onChange={(e) =>
-                        void updateSettings({ closeToTray: e.target.checked })
-                      }
-                      className="mt-0.5 rounded border-slate-700 bg-slate-900 text-brand-600"
-                    />
-                    <div>
-                      <span className="block font-medium text-slate-100">
-                        {t("settings.closeToTrayLabel")}
-                      </span>
-                      <span className="mt-0.5 block text-[11px] text-slate-400">
-                        {t("settings.closeToTrayDesc")}
-                      </span>
-                    </div>
-                  </label>
+                  <div className="space-y-3">
+                    <label className="flex cursor-pointer items-start gap-2.5 text-slate-300">
+                      <input
+                        type="checkbox"
+                        checked={closeToTray}
+                        onChange={(e) =>
+                          void updateSettings({ closeToTray: e.target.checked })
+                        }
+                        className="mt-0.5 rounded border-slate-700 bg-slate-900 text-brand-600"
+                      />
+                      <div>
+                        <span className="block font-medium text-slate-100">
+                          {t("settings.closeToTrayLabel")}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] text-slate-400">
+                          {t("settings.closeToTrayDesc")}
+                        </span>
+                      </div>
+                    </label>
+
+                    <label className="flex cursor-pointer items-start gap-2.5 text-slate-300">
+                      <input
+                        type="checkbox"
+                        checked={launchAtStartup}
+                        onChange={(e) =>
+                          void updateSettings({
+                            launchAtStartup: e.target.checked,
+                          })
+                        }
+                        className="mt-0.5 rounded border-slate-700 bg-slate-900 text-brand-600"
+                      />
+                      <div>
+                        <span className="block font-medium text-slate-100">
+                          {t("settings.launchAtStartupLabel")}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] text-slate-400">
+                          {t("settings.launchAtStartupDesc")}
+                        </span>
+                      </div>
+                    </label>
+
+                    <label className="flex cursor-pointer items-start gap-2.5 text-slate-300">
+                      <input
+                        type="checkbox"
+                        checked={startMinimized}
+                        onChange={(e) =>
+                          void updateSettings({
+                            startMinimized: e.target.checked,
+                          })
+                        }
+                        className="mt-0.5 rounded border-slate-700 bg-slate-900 text-brand-600"
+                      />
+                      <div>
+                        <span className="block font-medium text-slate-100">
+                          {t("settings.startMinimizedLabel")}
+                        </span>
+                        <span className="mt-0.5 block text-[11px] text-slate-400">
+                          {t("settings.startMinimizedDesc")}
+                        </span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
 
                 {/* Keyboard Shortcuts Reference */}

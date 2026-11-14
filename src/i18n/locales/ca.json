@@ -252,7 +252,10 @@
     "traySection": "Integració amb la safata del sistema",
     "closeToTrayLabel": "Minimitza a la safata del sistema en tancar la finestra",
     "closeToTrayDesc": "Manté el FerriVault actiu a la barra del sistema en prémer el botó de tancar.",
+    "launchAtStartupLabel": "Executa FerriVault en iniciar el sistema",
+    "launchAtStartupDesc": "Registra FerriVault perquè s'iniciï automàticament en obrir la sessió d'escriptori.",
     "startMinimizedLabel": "Inicia minimitzat a la safata del sistema",
+    "startMinimizedDesc": "Amaga la finestra principal en arrencar i deixa FerriVault llest a la safata del sistema.",
     "aboutSection": "Quant a FerriVault",
     "aboutDescription": "FerriVault és un client d'escriptori lliure i segur en memòria per a Bitwarden i Vaultwarden construït amb Tauri v2 i RustCrypto."
   },

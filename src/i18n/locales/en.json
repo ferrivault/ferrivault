@@ -252,7 +252,10 @@
     "traySection": "System Tray Integration",
     "closeToTrayLabel": "Minimize to System Tray when closing window",
     "closeToTrayDesc": "Keep FerriVault running in the OS notification bar when clicking the close button.",
+    "launchAtStartupLabel": "Launch FerriVault on system startup",
+    "launchAtStartupDesc": "Automatically register FerriVault to start when you log into your desktop session.",
     "startMinimizedLabel": "Start minimized in System Tray",
+    "startMinimizedDesc": "Hide the main window on launch and keep FerriVault ready in the system tray.",
     "aboutSection": "About FerriVault",
     "aboutDescription": "FerriVault is an open, memory-safe desktop client for Bitwarden and Vaultwarden powered by Tauri v2 and RustCrypto."
   },

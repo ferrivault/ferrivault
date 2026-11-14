@@ -42,6 +42,12 @@ pub struct AppSettings {
     /// Serialized JSON array of user-uploaded custom themes persisted on disk.
     #[serde(default)]
     pub custom_themes_json: String,
+    /// Whether FerriVault should automatically launch on OS startup.
+    #[serde(default)]
+    pub launch_at_startup: bool,
+    /// Whether FerriVault should start minimized in the system tray.
+    #[serde(default)]
+    pub start_minimized: bool,
 }
 
 impl Default for AppSettings {
@@ -54,6 +60,8 @@ impl Default for AppSettings {
             show_favicons: true,
             active_theme_id: default_theme_id(),
             custom_themes_json: "[]".to_string(),
+            launch_at_startup: false,
+            start_minimized: false,
         }
     }
 }

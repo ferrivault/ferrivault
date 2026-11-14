@@ -252,7 +252,10 @@
     "traySection": "Integración con la bandeja del sistema",
     "closeToTrayLabel": "Minimizar a la bandeja del sistema al cerrar la ventana",
     "closeToTrayDesc": "Mantiene FerriVault activo en la barra del sistema al pulsar el botón de cerrar.",
+    "launchAtStartupLabel": "Ejecutar FerriVault al iniciar el sistema",
+    "launchAtStartupDesc": "Registra FerriVault para que se inicie automáticamente al abrir tu sesión de escritorio.",
     "startMinimizedLabel": "Iniciar minimizado en la bandeja del sistema",
+    "startMinimizedDesc": "Oculta la ventana principal al arrancar y deja FerriVault listo en la bandeja del sistema.",
     "aboutSection": "Acerca de FerriVault",
     "aboutDescription": "FerriVault es un cliente de escritorio libre y seguro en memoria para Bitwarden y Vaultwarden construido con Tauri v2 y RustCrypto."
   },

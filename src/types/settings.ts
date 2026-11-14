@@ -6,6 +6,8 @@ export interface AppSettings {
   showFavicons: boolean;
   activeThemeId: string;
   customThemesJson: string;
+  launchAtStartup: boolean;
+  startMinimized: boolean;
 }
 
 export interface TrayMenuLabels {

@@ -86,3 +86,9 @@ impl From<reqwest::Error> for AppError {
         Self::Network(err.to_string())
     }
 }
+
+impl From<std::io::Error> for AppError {
+    fn from(err: std::io::Error) -> Self {
+        Self::Internal(err.to_string())
+    }
+}

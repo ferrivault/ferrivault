@@ -5,6 +5,8 @@
 //! all IPC commands.
 
 pub mod api;
+pub mod autostart;
+pub mod cli;
 pub mod commands;
 pub mod crypto;
 pub mod error;
@@ -95,15 +97,30 @@ fn ensure_linux_desktop_icon() {
 /// Builds and runs the Tauri v2 desktop application.
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    if let Some(exit_code) = crate::cli::maybe_run_cli() {
+        std::process::exit(exit_code);
+    }
+
     #[cfg(target_os = "linux")]
     ensure_linux_desktop_icon();
 
+    let start_minimized_arg = std::env::args().any(|arg| arg == "--minimized");
+
     let builder = tauri::Builder::default()
         .manage(AppState::new())
-        .setup(|app| {
+        .setup(move |app| {
+            let start_minimized_setting = app
+                .state::<AppState>()
+                .settings
+                .try_read()
+                .is_ok_and(|settings| settings.start_minimized);
+
             if let Some(window) = app.get_webview_window("main") {
                 if let Some(icon) = app.default_window_icon() {
                     let _ = window.set_icon(icon.clone());
+                }
+                if start_minimized_arg || start_minimized_setting {
+                    let _ = window.hide();
                 }
             }
             let _ = setup_system_tray(app.handle());
