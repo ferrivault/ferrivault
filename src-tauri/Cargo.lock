@@ -1174,6 +1174,39 @@ dependencies = [
 ]
 
 [[package]]
+name = "ferrivault"
+version = "0.1.0"
+dependencies = [
+ "aes",
+ "arboard",
+ "argon2",
+ "base64 0.22.1",
+ "cbc",
+ "chrono",
+ "data-encoding",
+ "hkdf",
+ "hmac",
+ "num-bigint",
+ "open",
+ "pbkdf2",
+ "rand 0.8.8",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "sha1",
+ "sha2",
+ "subtle",
+ "tauri",
+ "tauri-build",
+ "thiserror 2.0.21",
+ "tokio",
+ "tray-icon",
+ "url",
+ "uuid",
+ "zeroize",
+]
+
+[[package]]
 name = "field-offset"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3503,39 +3536,6 @@ name = "rustversion"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
-
-[[package]]
-name = "rustwarden"
-version = "0.1.0"
-dependencies = [
- "aes",
- "arboard",
- "argon2",
- "base64 0.22.1",
- "cbc",
- "chrono",
- "data-encoding",
- "hkdf",
- "hmac",
- "num-bigint",
- "open",
- "pbkdf2",
- "rand 0.8.8",
- "reqwest 0.12.28",
- "serde",
- "serde_json",
- "sha1",
- "sha2",
- "subtle",
- "tauri",
- "tauri-build",
- "thiserror 2.0.21",
- "tokio",
- "tray-icon",
- "url",
- "uuid",
- "zeroize",
-]
 
 [[package]]
 name = "ryu"

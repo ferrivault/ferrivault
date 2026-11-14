@@ -1,5 +1,5 @@
 {
-  "name": "rustwarden",
+  "name": "ferrivault",
   "private": true,
   "version": "0.1.0",
   "description": "Fast, secure cross-platform desktop client for Bitwarden and Vaultwarden built with Tauri v2 and Rust",

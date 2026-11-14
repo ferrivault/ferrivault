@@ -1,5 +1,5 @@
 # ==============================================================================
-# Rustwarden — Project Makefile
+# FerriVault — Project Makefile
 # ==============================================================================
 
 .DEFAULT_GOAL := help
@@ -15,7 +15,7 @@ TAURI_MANIFEST := src-tauri/Cargo.toml
 ## Display all available Make targets
 help:
 	@echo ""
-	@echo "Rustwarden — Available Commands:"
+	@echo "FerriVault — Available Commands:"
 	@echo "----------------------------------------------------------------------"
 	@echo "  make setup           Install npm dependencies and fetch Rust crates"
 	@echo "  make dev             Run the Tauri desktop app in development mode"

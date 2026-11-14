@@ -1,6 +1,6 @@
-# Rustwarden Documentation
+# FerriVault Documentation
 
-Welcome to the technical documentation for **Rustwarden**, a cross-platform desktop client for Bitwarden and Vaultwarden built with Tauri v2, Rust, React, TypeScript, and TailwindCSS.
+Welcome to the technical documentation for **FerriVault**, a cross-platform desktop client for Bitwarden and Vaultwarden built with Tauri v2, Rust, React, TypeScript, and TailwindCSS.
 
 ## Documentation Index
 

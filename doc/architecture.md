@@ -1,6 +1,6 @@
 # Architecture & IPC Design
 
-Rustwarden follows a strict **separation of privileges** between the user interface and the cryptographic/network core using **Tauri v2**.
+FerriVault follows a strict **separation of privileges** between the user interface and the cryptographic/network core using **Tauri v2**.
 
 ---
 
@@ -60,4 +60,4 @@ Rustwarden follows a strict **separation of privileges** between the user interf
   - `endpoints.rs`: Normalizes URLs for Bitwarden Official US (`vault.bitwarden.com`), Official EU (`vault.bitwarden.eu`), and custom self-hosted Vaultwarden servers.
   - `auth.rs`, `sync.rs`, `ciphers.rs`: Implements HTTP communication with Bitwarden/Vaultwarden REST endpoints using `reqwest` with `rustls-tls`.
 - **`tray.rs`**:
-  - Registers the native OS system tray icon (`rustwarden-tray`) and intercepts `WindowEvent::CloseRequested` when `close_to_tray` is active so closing the window hides it to the system tray instead of terminating the process.
+  - Registers the native OS system tray icon (`ferrivault-tray`) and intercepts `WindowEvent::CloseRequested` when `close_to_tray` is active so closing the window hides it to the system tray instead of terminating the process.

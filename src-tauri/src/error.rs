@@ -1,4 +1,4 @@
-//! Unified error handling for the Rustwarden backend.
+//! Unified error handling for the FerriVault backend.
 //!
 //! All Tauri commands return `Result<T, AppError>`, where [`AppError`] serializes
 //! into a structured JSON object with an `errorKey` (matching an i18n translation key

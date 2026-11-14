@@ -10,7 +10,7 @@ import {
 import type { LoginPayload, ServerRegion } from "../types/auth";
 import type { VaultSnapshot } from "../types/vault";
 
-const SERVER_PREF_KEY = "rustwarden_server_prefs";
+const SERVER_PREF_KEY = "ferrivault_server_prefs";
 
 interface SavedServerPrefs {
   email: string;

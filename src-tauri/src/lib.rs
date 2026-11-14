@@ -1,4 +1,4 @@
-//! Rustwarden Tauri v2 library entrypoint.
+//! FerriVault Tauri v2 library entrypoint.
 //!
 //! Initializes managed application state, sets up the native OS system tray icon,
 //! intercepts the window close event when `close_to_tray` is enabled, and registers
@@ -32,7 +32,7 @@ use crate::tray::setup_system_tray;
 /// Ensures that on Linux (especially Wayland compositors like KDE KWin and GNOME Mutter,
 /// which resolve window titlebar/taskbar icons from `.desktop` entries matching the
 /// Wayland `app_id` rather than X11 `_NET_WM_ICON`), the user's `~/.local/share` has
-/// the Rustwarden icon and `.desktop` metadata installed even during `cargo tauri dev`.
+/// the FerriVault icon and `.desktop` metadata installed even during `cargo tauri dev`.
 #[cfg(target_os = "linux")]
 fn ensure_linux_desktop_icon() {
     use std::path::PathBuf;
@@ -63,31 +63,31 @@ fn ensure_linux_desktop_icon() {
     let _ = std::fs::create_dir_all(&apps_dir);
 
     let icon_bytes = include_bytes!("../icons/128x128.png");
-    let icon_path = icon_dir.join("rustwarden.png");
+    let icon_path = icon_dir.join("ferrivault.png");
     let _ = std::fs::write(&icon_path, icon_bytes);
-    let _ = std::fs::write(icon_dir.join("com.rustwarden.desktop.png"), icon_bytes);
+    let _ = std::fs::write(icon_dir.join("app.ferrivault.desktop.png"), icon_bytes);
 
     let icon_path_str = icon_path.to_string_lossy();
     let exec_path = std::env::current_exe()
         .ok()
         .map(|p| p.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "rustwarden".to_string());
+        .unwrap_or_else(|| "ferrivault".to_string());
 
     let desktop_contents = format!(
         "[Desktop Entry]\n\
          Type=Application\n\
-         Name=Rustwarden\n\
+         Name=FerriVault\n\
          Comment=Secure Desktop Client for Bitwarden & Vaultwarden\n\
          Exec=\"{exec_path}\"\n\
          Icon={icon_path_str}\n\
          Terminal=false\n\
          Categories=Utility;Security;\n\
-         StartupWMClass=rustwarden\n"
+         StartupWMClass=ferrivault\n"
     );
 
-    let _ = std::fs::write(apps_dir.join("rustwarden.desktop"), &desktop_contents);
+    let _ = std::fs::write(apps_dir.join("ferrivault.desktop"), &desktop_contents);
     let _ = std::fs::write(
-        apps_dir.join("com.rustwarden.desktop.desktop"),
+        apps_dir.join("app.ferrivault.desktop.desktop"),
         &desktop_contents,
     );
 }
@@ -144,6 +144,6 @@ pub fn run() {
         ]);
 
     if let Err(err) = builder.run(tauri::generate_context!()) {
-        eprintln!("Error while running Rustwarden application: {err}");
+        eprintln!("Error while running FerriVault application: {err}");
     }
 }

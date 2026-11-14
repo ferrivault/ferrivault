@@ -6,7 +6,7 @@ import es from "./locales/es.json";
 import ca from "./locales/ca.json";
 
 /**
- * Metadata definition for each supported locale in Rustwarden.
+ * Metadata definition for each supported locale in FerriVault.
  * Community contributors can add a new language by:
  * 1. Creating `src/i18n/locales/<code>.json` (matching the structure of `en.json`).
  * 2. Importing it above and appending an entry to `SUPPORTED_LOCALES`.
@@ -46,7 +46,7 @@ export const SUPPORTED_LOCALES: readonly LocaleMetadata[] = [
 export type SupportedLocaleCode = (typeof SUPPORTED_LOCALES)[number]["code"];
 
 export const DEFAULT_LOCALE = "en";
-const STORAGE_KEY = "rustwarden_locale";
+const STORAGE_KEY = "ferrivault_locale";
 
 /**
  * Detects the initial locale from localStorage or browser/OS preferences,

@@ -1,6 +1,6 @@
 //! System tray integration and localized context menu management.
 //!
-//! Creates a persistent OS tray icon (`"rustwarden-tray"`) with a localized menu
+//! Creates a persistent OS tray icon (`"ferrivault-tray"`) with a localized menu
 //! that can be dynamically updated whenever the user switches the UI language.
 
 use serde::{Deserialize, Serialize};
@@ -14,7 +14,7 @@ use crate::error::AppError;
 use crate::state::AppState;
 
 /// Tray icon identifier registered with Tauri.
-pub const TRAY_ID: &str = "rustwarden-tray";
+pub const TRAY_ID: &str = "ferrivault-tray";
 
 /// Localized labels sent from the frontend i18n module to update the native OS tray menu.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -30,11 +30,11 @@ pub struct TrayMenuLabels {
 impl Default for TrayMenuLabels {
     fn default() -> Self {
         Self {
-            show_window: "Show / Hide Rustwarden".to_string(),
+            show_window: "Show / Hide FerriVault".to_string(),
             open_generator: "Password Generator".to_string(),
             sync_vault: "Sync Vault Now".to_string(),
             lock_vault: "Lock Vault".to_string(),
-            quit: "Quit Rustwarden".to_string(),
+            quit: "Quit FerriVault".to_string(),
         }
     }
 }
@@ -115,7 +115,7 @@ pub fn setup_system_tray<R: Runtime>(app: &AppHandle<R>) -> Result<(), AppError>
     let menu = build_tray_menu(app, &TrayMenuLabels::default())?;
 
     let mut builder = TrayIconBuilder::with_id(TRAY_ID)
-        .tooltip("Rustwarden — Bitwarden Desktop Client")
+        .tooltip("FerriVault — Bitwarden Desktop Client")
         .menu(&menu)
         .show_menu_on_left_click(false)
         .on_menu_event(|app_handle, event| match event.id.as_ref() {

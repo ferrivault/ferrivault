@@ -1,6 +1,6 @@
-# Rustwarden
+# FerriVault
 
-**Rustwarden** is a fast, memory-safe, cross-platform desktop client for **Bitwarden** (`bitwarden.com`, `bitwarden.eu`) and self-hosted **Vaultwarden** servers, built with **Tauri v2**, **Rust**, **React**, **TypeScript**, and **TailwindCSS**.
+**FerriVault** is a fast, memory-safe, cross-platform desktop client for **Bitwarden** (`bitwarden.com`, `bitwarden.eu`) and self-hosted **Vaultwarden** servers, built with **Tauri v2**, **Rust**, **React**, **TypeScript**, and **TailwindCSS**.
 
 ---
 

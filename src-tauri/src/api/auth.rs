@@ -167,7 +167,7 @@ pub async fn login_with_password(
         // DeviceType 8 = Linux Desktop
         ("deviceType", "8".to_string()),
         ("deviceIdentifier", device_id.to_string()),
-        ("deviceName", "Rustwarden Desktop".to_string()),
+        ("deviceName", "FerriVault Desktop".to_string()),
     ];
 
     if let Some(otp) = verification

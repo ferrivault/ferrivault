@@ -1,6 +1,6 @@
 # Cryptography & Security Model
 
-Rustwarden implements the official Bitwarden cryptographic specification strictly inside the Rust backend (`src-tauri/src/crypto/`) using audited crates from the **RustCrypto** project.
+FerriVault implements the official Bitwarden cryptographic specification strictly inside the Rust backend (`src-tauri/src/crypto/`) using audited crates from the **RustCrypto** project.
 
 ---
 
@@ -55,4 +55,4 @@ All vault items (ciphers, login credentials, notes, cards, identities, custom fi
 When the user copies a password, TOTP code, or card number via `copy_to_clipboard`:
 1. The secret is written to the OS clipboard via `arboard`.
 2. A background asynchronous timer waits for `clipboard_clear_seconds` (configurable in Settings; default: `30s`).
-3. When the timer fires, Rustwarden checks whether the OS clipboard still contains the exact secret copied earlier. If it matches, the clipboard is overwritten with an empty string and the UI is notified via the `clipboard:cleared` event.
+3. When the timer fires, FerriVault checks whether the OS clipboard still contains the exact secret copied earlier. If it matches, the clipboard is overwritten with an empty string and the UI is notified via the `clipboard:cleared` event.

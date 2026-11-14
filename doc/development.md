@@ -1,6 +1,6 @@
 # Development & Build Guide
 
-This document describes the prerequisites, `Makefile` targets, and verification workflows for developing and packaging **Rustwarden**.
+This document describes the prerequisites, `Makefile` targets, and verification workflows for developing and packaging **FerriVault**.
 
 ---
 

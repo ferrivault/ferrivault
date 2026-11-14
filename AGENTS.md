@@ -1,8 +1,8 @@
-# AGENTS.md — Rustwarden Architecture & Engineering Guidelines
+# AGENTS.md — FerriVault Architecture & Engineering Guidelines
 
 ## 1. Project Overview
 
-**Rustwarden** is a fast, secure, cross-platform desktop client for Bitwarden and Vaultwarden (self-hosted), built with **Tauri v2**, **Rust**, **React**, **TypeScript**, and **TailwindCSS**.
+**FerriVault** is a fast, secure, cross-platform desktop client for Bitwarden and Vaultwarden (self-hosted), built with **Tauri v2**, **Rust**, **React**, **TypeScript**, and **TailwindCSS**.
 
 ### Core Objectives
 - **Security First**: All cryptographic operations, master key derivation, vault decryption/encryption, TOTP generation, and clipboard clearing occur strictly in the **Rust backend**. Plaintext secrets only cross the IPC boundary when explicitly requested by the UI, and sensitive memory in Rust is zeroized on drop (`zeroize`).
@@ -61,7 +61,7 @@
 ## 4. Directory Structure
 
 ```text
-rustwarden/
+ferrivault/
 ├── AGENTS.md                        # AI Agent & developer guidelines (this file)
 ├── README.md                        # Project documentation (in English)
 ├── package.json                     # Frontend dependencies and scripts

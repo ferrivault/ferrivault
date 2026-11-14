@@ -1,13 +1,13 @@
 [package]
-name = "rustwarden"
+name = "ferrivault"
 version = "0.1.0"
 description = "Fast, secure cross-platform desktop client for Bitwarden and Vaultwarden"
-authors = ["Rustwarden Contributors"]
+authors = ["FerriVault Contributors"]
 edition = "2021"
 rust-version = "1.77"
 
 [lib]
-name = "rustwarden_lib"
+name = "ferrivault_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
