@@ -1,0 +1,48 @@
+[package]
+name = "rustwarden"
+version = "0.1.0"
+description = "Fast, secure cross-platform desktop client for Bitwarden and Vaultwarden"
+authors = ["Rustwarden Contributors"]
+edition = "2021"
+rust-version = "1.77"
+
+[lib]
+name = "rustwarden_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "2"
+tokio = { version = "1", features = ["sync", "time", "rt", "macros"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "gzip"] }
+url = "2"
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+# Cryptographic primitives (Bitwarden specification)
+aes = "0.8"
+cbc = { version = "0.1", features = ["alloc"] }
+pbkdf2 = { version = "0.12", features = ["hmac"] }
+argon2 = "0.5"
+hkdf = "0.12"
+hmac = "0.12"
+sha1 = "0.10"
+sha2 = "0.10"
+subtle = "2.6"
+zeroize = { version = "1.8", features = ["derive"] }
+rand = "0.8"
+base64 = "0.22"
+data-encoding = "2.6"
+arboard = "3.4"
+open = "5.3"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "warn"
+redundant_clone = "warn"
+needless_collect = "warn"
