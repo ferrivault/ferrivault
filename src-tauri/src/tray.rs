@@ -90,9 +90,11 @@ pub fn build_tray_menu<R: Runtime>(
 pub fn toggle_main_window<R: Runtime>(app: &AppHandle<R>) {
     if let Some(window) = app.get_webview_window("main") {
         let is_visible = window.is_visible().unwrap_or(false);
-        if is_visible {
+        let is_minimized = window.is_minimized().unwrap_or(false);
+        if is_visible && !is_minimized {
             let _ = window.hide();
         } else {
+            let _ = window.unminimize();
             let _ = window.show();
             let _ = window.set_focus();
         }
@@ -102,6 +104,7 @@ pub fn toggle_main_window<R: Runtime>(app: &AppHandle<R>) {
 /// Shows and focuses the main application window.
 pub fn show_main_window<R: Runtime>(app: &AppHandle<R>) {
     if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
         let _ = window.show();
         let _ = window.set_focus();
     }
