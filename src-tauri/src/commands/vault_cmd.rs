@@ -10,7 +10,7 @@ use crate::api::{
     },
     sync::fetch_sync,
 };
-use crate::commands::auth_cmd::decrypt_sync_response;
+use crate::commands::auth_cmd::{decrypt_organization_keys, decrypt_sync_response};
 use crate::error::AppError;
 use crate::models::{
     cipher::CipherView,
@@ -67,14 +67,29 @@ pub async fn save_cipher(
         return Err(AppError::Validation("Item name is required".into()));
     }
 
-    let (endpoints, access_token, vault_key) = {
+    let (endpoints, access_token, vault_key, org_keys) = {
         let session_guard = state.session.read().await;
         let session = session_guard.as_ref().ok_or(AppError::VaultLocked)?;
         let key = session.vault_key.clone().ok_or(AppError::VaultLocked)?;
-        (session.endpoints.clone(), session.access_token.clone(), key)
+        let orgs = session
+            .last_encrypted_sync
+            .as_ref()
+            .map(|s| decrypt_organization_keys(s, &key))
+            .unwrap_or_default();
+        (
+            session.endpoints.clone(),
+            session.access_token.clone(),
+            key,
+            orgs,
+        )
     };
 
-    let encrypted_payload = cipher.encrypt(&vault_key)?;
+    let target_key = match cipher.organization_id.as_deref().filter(|s| !s.is_empty()) {
+        Some(org_id) => org_keys.get(org_id).unwrap_or(&vault_key),
+        None => &vault_key,
+    };
+
+    let encrypted_payload = cipher.encrypt(target_key)?;
     let saved_encrypted = if cipher.id.trim().is_empty() {
         create_cipher_remote(
             &state.http_client,
@@ -94,7 +109,7 @@ pub async fn save_cipher(
         .await?
     };
 
-    let saved_decrypted = saved_encrypted.decrypt(&vault_key)?;
+    let saved_decrypted = saved_encrypted.decrypt_with_org_keys(&vault_key, &org_keys)?;
 
     let mut session_guard = state.session.write().await;
     if let Some(session) = session_guard.as_mut() {

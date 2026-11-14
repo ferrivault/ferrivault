@@ -1,5 +1,7 @@
 //! Authentication, vault unlock, lock, and logout Tauri commands.
 
+use std::collections::HashMap;
+
 use serde::Deserialize;
 use tauri::State;
 
@@ -9,7 +11,7 @@ use crate::api::{
     sync::{fetch_sync, SyncResponse},
 };
 use crate::crypto::{
-    enc_string::EncString,
+    enc_string::{decrypt_rsa_enc_string, EncString},
     kdf::{derive_master_key, derive_master_password_hash, stretch_master_key, KdfParams},
     keys::SymmetricCryptoKey,
 };
@@ -38,6 +40,45 @@ fn decrypt_vault_key(
     SymmetricCryptoKey::from_slice(&raw_key_bytes)
 }
 
+/// Extracts and decrypts all enabled Organization symmetric keys from [`SyncResponse`].
+pub(crate) fn decrypt_organization_keys(
+    sync_resp: &SyncResponse,
+    vault_key: &SymmetricCryptoKey,
+) -> HashMap<String, SymmetricCryptoKey> {
+    let mut org_keys = HashMap::new();
+    let Some(profile) = &sync_resp.profile else {
+        return org_keys;
+    };
+    let Some(enc_priv_key_str) = profile.private_key.as_deref().filter(|s| !s.is_empty()) else {
+        return org_keys;
+    };
+    let Ok(parsed_priv) = EncString::parse(enc_priv_key_str) else {
+        return org_keys;
+    };
+    let Ok(private_key_der) = parsed_priv.decrypt_bytes(vault_key) else {
+        return org_keys;
+    };
+
+    for org in &profile.organizations {
+        if !org.enabled {
+            continue;
+        }
+        let Some(org_id) = org.id.as_deref().filter(|s| !s.is_empty()) else {
+            continue;
+        };
+        let Some(org_key_wire) = org.key.as_deref().filter(|s| !s.is_empty()) else {
+            continue;
+        };
+        if let Ok(raw_org_key) = decrypt_rsa_enc_string(org_key_wire, &private_key_der) {
+            if let Ok(sym_key) = SymmetricCryptoKey::from_slice(&raw_org_key) {
+                org_keys.insert(org_id.to_string(), sym_key);
+            }
+        }
+    }
+
+    org_keys
+}
+
 /// Decrypts a full [`SyncResponse`] into a [`VaultSnapshot`] using the active `vault_key`.
 pub fn decrypt_sync_response(
     email: &str,
@@ -45,6 +86,8 @@ pub fn decrypt_sync_response(
     sync_resp: &SyncResponse,
     vault_key: &SymmetricCryptoKey,
 ) -> VaultSnapshot {
+    let org_keys = decrypt_organization_keys(sync_resp, vault_key);
+
     let mut folders = Vec::new();
     for enc_folder in &sync_resp.folders {
         if let Ok(Some(folder)) = enc_folder.decrypt(vault_key) {
@@ -55,7 +98,7 @@ pub fn decrypt_sync_response(
 
     let mut ciphers = Vec::new();
     for enc_cipher in &sync_resp.ciphers {
-        if let Ok(cipher) = enc_cipher.decrypt(vault_key) {
+        if let Ok(cipher) = enc_cipher.decrypt_with_org_keys(vault_key, &org_keys) {
             ciphers.push(cipher);
         }
     }

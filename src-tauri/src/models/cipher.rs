@@ -1,6 +1,8 @@
 //! Cipher models (Login, Secure Note, Card, Identity, and Custom Fields)
 //! in both encrypted Bitwarden wire format and decrypted frontend DTO format.
 
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use crate::crypto::{
@@ -157,6 +159,8 @@ pub struct EncryptedCipher {
     pub deleted_date: Option<String>,
     #[serde(alias = "Reprompt", default)]
     pub reprompt: u8,
+    #[serde(alias = "Key")]
+    pub key: Option<String>,
 }
 
 // ============================================================================
@@ -249,10 +253,42 @@ pub struct CipherView {
 impl EncryptedCipher {
     /// Decrypts an [`EncryptedCipher`] using the vault's [`SymmetricCryptoKey`].
     pub fn decrypt(&self, key: &SymmetricCryptoKey) -> Result<CipherView, AppError> {
+        self.decrypt_with_org_keys(key, &HashMap::new())
+    }
+
+    /// Decrypts an [`EncryptedCipher`] using the user's `vault_key`, optional decrypted
+    /// `org_keys` (for organization-owned ciphers), and optional per-cipher `self.key`.
+    pub fn decrypt_with_org_keys(
+        &self,
+        vault_key: &SymmetricCryptoKey,
+        org_keys: &HashMap<String, SymmetricCryptoKey>,
+    ) -> Result<CipherView, AppError> {
+        // 1. Resolve the base key (organization key if organization_id is present, otherwise vault_key)
+        let base_key = match self.organization_id.as_deref().filter(|s| !s.is_empty()) {
+            Some(org_id) => org_keys.get(org_id).ok_or_else(|| {
+                AppError::Crypto(format!(
+                    "Missing organization key for organization {org_id}"
+                ))
+            })?,
+            None => vault_key,
+        };
+
+        // 2. Unwrap the per-cipher key (`self.key`) if present; otherwise use `base_key` directly
+        let unwrapped_cipher_key = match self.key.as_deref().filter(|s| !s.trim().is_empty()) {
+            Some(cipher_key_wire) => {
+                let parsed = EncString::parse(cipher_key_wire)?;
+                let raw_bytes = parsed.decrypt_bytes(base_key)?;
+                Some(SymmetricCryptoKey::from_slice(&raw_bytes)?)
+            }
+            None => None,
+        };
+        let key = unwrapped_cipher_key.as_ref().unwrap_or(base_key);
+
         let id = self.id.clone().unwrap_or_default();
-        let name = decrypt_optional(self.name.as_deref(), key)
-            .unwrap_or(None)
-            .unwrap_or_else(|| "Untitled Item".to_string());
+        // Propagate decryption failure (`?`) instead of fabricating a phantom "Untitled Item"
+        let name = decrypt_optional(self.name.as_deref(), key)?
+            .filter(|s| !s.trim().is_empty())
+            .ok_or_else(|| AppError::Crypto("Cipher has no decryptable name".into()))?;
         let notes = decrypt_optional(self.notes.as_deref(), key).unwrap_or(None);
 
         let login = match &self.login {
@@ -457,6 +493,7 @@ impl CipherView {
             creation_date: self.creation_date.clone(),
             deleted_date: self.deleted_date.clone(),
             reprompt: 0,
+            key: None,
         })
     }
 }

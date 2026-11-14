@@ -7,6 +7,24 @@ use crate::api::endpoints::ServerEndpoints;
 use crate::error::AppError;
 use crate::models::{cipher::EncryptedCipher, folder::EncryptedFolder};
 
+/// Organization membership entry inside [`SyncProfile`].
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SyncOrganization {
+    #[serde(alias = "Id")]
+    pub id: Option<String>,
+    #[serde(alias = "Name")]
+    pub name: Option<String>,
+    #[serde(alias = "Key")]
+    pub key: Option<String>,
+    #[serde(alias = "Enabled", default = "default_true")]
+    pub enabled: bool,
+}
+
+fn default_true() -> bool {
+    true
+}
+
 /// Profile block inside the `/api/sync` response.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -19,6 +37,10 @@ pub struct SyncProfile {
     pub name: Option<String>,
     #[serde(alias = "Key")]
     pub key: Option<String>,
+    #[serde(alias = "PrivateKey")]
+    pub private_key: Option<String>,
+    #[serde(alias = "Organizations", default)]
+    pub organizations: Vec<SyncOrganization>,
 }
 
 /// Top-level payload returned by `GET /api/sync`.
