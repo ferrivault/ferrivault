@@ -50,7 +50,7 @@ pub fn decrypt_sync_response(
             folders.push(folder);
         }
     }
-    folders.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    folders.sort_by_key(|a| a.name.to_lowercase());
 
     let mut ciphers = Vec::new();
     for enc_cipher in &sync_resp.ciphers {
@@ -58,7 +58,7 @@ pub fn decrypt_sync_response(
             ciphers.push(cipher);
         }
     }
-    ciphers.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+    ciphers.sort_by_key(|a| a.name.to_lowercase());
 
     VaultSnapshot {
         email: email.to_string(),

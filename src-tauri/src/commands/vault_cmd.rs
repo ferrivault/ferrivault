@@ -109,7 +109,7 @@ pub async fn save_cipher(
             }
             snapshot
                 .ciphers
-                .sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+                .sort_by_key(|a| a.name.to_lowercase());
         }
     }
 
@@ -228,7 +228,7 @@ pub async fn save_folder(
             }
             snapshot
                 .folders
-                .sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+                .sort_by_key(|a| a.name.to_lowercase());
         }
     }
 

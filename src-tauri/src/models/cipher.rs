@@ -281,43 +281,37 @@ impl EncryptedCipher {
             None => None,
         };
 
-        let card = match &self.card {
-            Some(enc_card) => Some(CardView {
-                cardholder_name: decrypt_optional(enc_card.cardholder_name.as_deref(), key)
-                    .unwrap_or(None),
-                brand: decrypt_optional(enc_card.brand.as_deref(), key).unwrap_or(None),
-                number: decrypt_optional(enc_card.number.as_deref(), key).unwrap_or(None),
-                exp_month: decrypt_optional(enc_card.exp_month.as_deref(), key).unwrap_or(None),
-                exp_year: decrypt_optional(enc_card.exp_year.as_deref(), key).unwrap_or(None),
-                code: decrypt_optional(enc_card.code.as_deref(), key).unwrap_or(None),
-            }),
-            None => None,
-        };
+        let card = self.card.as_ref().map(|enc_card| CardView {
+            cardholder_name: decrypt_optional(enc_card.cardholder_name.as_deref(), key)
+                .unwrap_or(None),
+            brand: decrypt_optional(enc_card.brand.as_deref(), key).unwrap_or(None),
+            number: decrypt_optional(enc_card.number.as_deref(), key).unwrap_or(None),
+            exp_month: decrypt_optional(enc_card.exp_month.as_deref(), key).unwrap_or(None),
+            exp_year: decrypt_optional(enc_card.exp_year.as_deref(), key).unwrap_or(None),
+            code: decrypt_optional(enc_card.code.as_deref(), key).unwrap_or(None),
+        });
 
-        let identity = match &self.identity {
-            Some(enc_id) => Some(IdentityView {
-                title: decrypt_optional(enc_id.title.as_deref(), key).unwrap_or(None),
-                first_name: decrypt_optional(enc_id.first_name.as_deref(), key).unwrap_or(None),
-                middle_name: decrypt_optional(enc_id.middle_name.as_deref(), key).unwrap_or(None),
-                last_name: decrypt_optional(enc_id.last_name.as_deref(), key).unwrap_or(None),
-                username: decrypt_optional(enc_id.username.as_deref(), key).unwrap_or(None),
-                company: decrypt_optional(enc_id.company.as_deref(), key).unwrap_or(None),
-                email: decrypt_optional(enc_id.email.as_deref(), key).unwrap_or(None),
-                phone: decrypt_optional(enc_id.phone.as_deref(), key).unwrap_or(None),
-                ssn: decrypt_optional(enc_id.ssn.as_deref(), key).unwrap_or(None),
-                passport_number: decrypt_optional(enc_id.passport_number.as_deref(), key)
-                    .unwrap_or(None),
-                license_number: decrypt_optional(enc_id.license_number.as_deref(), key)
-                    .unwrap_or(None),
-                address1: decrypt_optional(enc_id.address1.as_deref(), key).unwrap_or(None),
-                address2: decrypt_optional(enc_id.address2.as_deref(), key).unwrap_or(None),
-                city: decrypt_optional(enc_id.city.as_deref(), key).unwrap_or(None),
-                state: decrypt_optional(enc_id.state.as_deref(), key).unwrap_or(None),
-                postal_code: decrypt_optional(enc_id.postal_code.as_deref(), key).unwrap_or(None),
-                country: decrypt_optional(enc_id.country.as_deref(), key).unwrap_or(None),
-            }),
-            None => None,
-        };
+        let identity = self.identity.as_ref().map(|enc_id| IdentityView {
+            title: decrypt_optional(enc_id.title.as_deref(), key).unwrap_or(None),
+            first_name: decrypt_optional(enc_id.first_name.as_deref(), key).unwrap_or(None),
+            middle_name: decrypt_optional(enc_id.middle_name.as_deref(), key).unwrap_or(None),
+            last_name: decrypt_optional(enc_id.last_name.as_deref(), key).unwrap_or(None),
+            username: decrypt_optional(enc_id.username.as_deref(), key).unwrap_or(None),
+            company: decrypt_optional(enc_id.company.as_deref(), key).unwrap_or(None),
+            email: decrypt_optional(enc_id.email.as_deref(), key).unwrap_or(None),
+            phone: decrypt_optional(enc_id.phone.as_deref(), key).unwrap_or(None),
+            ssn: decrypt_optional(enc_id.ssn.as_deref(), key).unwrap_or(None),
+            passport_number: decrypt_optional(enc_id.passport_number.as_deref(), key)
+                .unwrap_or(None),
+            license_number: decrypt_optional(enc_id.license_number.as_deref(), key)
+                .unwrap_or(None),
+            address1: decrypt_optional(enc_id.address1.as_deref(), key).unwrap_or(None),
+            address2: decrypt_optional(enc_id.address2.as_deref(), key).unwrap_or(None),
+            city: decrypt_optional(enc_id.city.as_deref(), key).unwrap_or(None),
+            state: decrypt_optional(enc_id.state.as_deref(), key).unwrap_or(None),
+            postal_code: decrypt_optional(enc_id.postal_code.as_deref(), key).unwrap_or(None),
+            country: decrypt_optional(enc_id.country.as_deref(), key).unwrap_or(None),
+        });
 
         let mut fields = Vec::new();
         if let Some(enc_fields) = &self.fields {

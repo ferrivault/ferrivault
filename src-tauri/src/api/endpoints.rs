@@ -6,21 +6,16 @@ use url::Url;
 use crate::error::AppError;
 
 /// Supported server environment presets.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ServerRegion {
     /// Official Bitwarden US cloud (`vault.bitwarden.com`)
+    #[default]
     OfficialUs,
     /// Official Bitwarden EU cloud (`vault.bitwarden.eu`)
     OfficialEu,
     /// Self-hosted Bitwarden or Vaultwarden instance
     SelfHosted,
-}
-
-impl Default for ServerRegion {
-    fn default() -> Self {
-        Self::OfficialUs
-    }
 }
 
 /// Resolved base URLs for the Identity OAuth2 service and the Vault REST API.
