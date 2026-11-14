@@ -7,6 +7,7 @@ import {
   GlobeIcon,
   KeyRoundIcon,
   LockIcon,
+  MailCheckIcon,
   MailIcon,
   ServerIcon,
   ShieldCheckIcon,
@@ -17,6 +18,8 @@ import { useAuthStore } from "../../stores/authStore";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { useVaultStore } from "../../stores/vaultStore";
 import type { ServerRegion } from "../../types/auth";
+
+type LoginStep = "credentials" | "twoFactor" | "newDevice";
 
 /**
  * Crisp inline SVG US flag badge.
@@ -74,16 +77,16 @@ export const LoginView: React.FC = () => {
   const locale = useSettingsStore((s) => s.locale);
   const changeLanguage = useSettingsStore((s) => s.changeLanguage);
 
+  const [step, setStep] = useState<LoginStep>("credentials");
   const [region, setRegion] = useState<ServerRegion>(auth.region);
   const [customServerUrl, setCustomServerUrl] = useState(auth.customServerUrl);
   const [email, setEmail] = useState(auth.email);
   const [masterPassword, setMasterPassword] = useState("");
-  const [twoFactorCode, setTwoFactorCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
-  const [highlightCodeInput, setHighlightCodeInput] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorText(null);
 
@@ -103,16 +106,21 @@ export const LoginView: React.FC = () => {
         region,
         customServerUrl:
           region === "selfHosted" ? customServerUrl.trim() : undefined,
-        twoFactorCode: twoFactorCode.trim() || undefined,
       });
       setSnapshot(snapshot);
     } catch (err) {
       const parsed = parseBackendError(err);
-      if (
-        parsed.errorKey === "errors.twoFactorRequired" ||
-        parsed.errorKey === "errors.newDeviceVerificationRequired"
-      ) {
-        setHighlightCodeInput(true);
+      if (parsed.errorKey === "errors.newDeviceVerificationRequired") {
+        setVerificationCode("");
+        setErrorText(null);
+        setStep("newDevice");
+        return;
+      }
+      if (parsed.errorKey === "errors.twoFactorRequired") {
+        setVerificationCode("");
+        setErrorText(null);
+        setStep("twoFactor");
+        return;
       }
       setErrorText(
         t(parsed.errorKey, {
@@ -121,6 +129,44 @@ export const LoginView: React.FC = () => {
         })
       );
     }
+  };
+
+  const handleVerificationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErrorText(null);
+
+    const code = verificationCode.trim();
+    if (!code) {
+      setErrorText(t("errors.validationRequired"));
+      return;
+    }
+
+    try {
+      const snapshot = await auth.login({
+        email: email.trim(),
+        masterPassword,
+        region,
+        customServerUrl:
+          region === "selfHosted" ? customServerUrl.trim() : undefined,
+        twoFactorCode: step === "twoFactor" ? code : undefined,
+        newDeviceOtp: step === "newDevice" ? code : undefined,
+      });
+      setSnapshot(snapshot);
+    } catch (err) {
+      const parsed = parseBackendError(err);
+      setErrorText(
+        t(parsed.errorKey, {
+          message: parsed.message,
+          defaultValue: parsed.message,
+        })
+      );
+    }
+  };
+
+  const handleBackToCredentials = () => {
+    setErrorText(null);
+    setVerificationCode("");
+    setStep("credentials");
   };
 
   const serverOptions: Array<{
@@ -188,188 +234,260 @@ export const LoginView: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Login Card */}
+      {/* Main Card */}
       <div className="mx-auto w-full max-w-md rounded-2xl border border-slate-800/90 bg-slate-900/75 p-7 shadow-2xl backdrop-blur">
-        <div className="mb-6 text-center">
-          <h1 className="text-xl font-bold text-white">
-            {t("auth.signInTitle")}
-          </h1>
-          <p className="mt-1 text-xs text-slate-400">
-            {t("auth.signInSubtitle")}
-          </p>
-        </div>
+        {step === "credentials" ? (
+          <>
+            <div className="mb-6 text-center">
+              <h1 className="text-xl font-bold text-white">
+                {t("auth.signInTitle")}
+              </h1>
+              <p className="mt-1 text-xs text-slate-400">
+                {t("auth.signInSubtitle")}
+              </p>
+            </div>
 
-        {errorText && (
-          <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-500/40 bg-red-950/50 p-3 text-xs text-red-200">
-            <CircleAlertIcon size={16} className="mt-0.5 shrink-0 text-red-400" />
-            <span>{errorText}</span>
-          </div>
-        )}
+            {errorText && (
+              <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-500/40 bg-red-950/50 p-3 text-xs text-red-200">
+                <CircleAlertIcon
+                  size={16}
+                  className="mt-0.5 shrink-0 text-red-400"
+                />
+                <span>{errorText}</span>
+              </div>
+            )}
 
-        <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
-          {/* Server Environment Radio Cards with Flags */}
-          <div>
-            <label className="mb-2 block text-xs font-medium text-slate-300">
-              {t("auth.serverRegion")}
-            </label>
-            <div
-              role="radiogroup"
-              aria-label={t("auth.serverRegion")}
-              className="grid grid-cols-3 gap-2.5"
+            <form
+              onSubmit={(e) => void handleCredentialsSubmit(e)}
+              className="space-y-4"
             >
-              {serverOptions.map((opt) => {
-                const active = region === opt.id;
-                return (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    role="radio"
-                    aria-checked={active}
-                    onClick={() => setRegion(opt.id)}
-                    className={`group relative flex flex-col items-start justify-between rounded-xl border p-3 text-left transition ${
-                      active
-                        ? "border-brand-500 bg-brand-600/15 shadow-sm shadow-brand-500/20"
-                        : "border-slate-800 bg-slate-950/90 hover:border-slate-700 hover:bg-slate-900"
-                    }`}
-                  >
-                    <div className="flex w-full items-center justify-between">
-                      {opt.badge}
-                      <span
-                        className={`flex h-3.5 w-3.5 items-center justify-center rounded-full border ${
+              {/* Server Environment Radio Cards with Flags */}
+              <div>
+                <label className="mb-2 block text-xs font-medium text-slate-300">
+                  {t("auth.serverRegion")}
+                </label>
+                <div
+                  role="radiogroup"
+                  aria-label={t("auth.serverRegion")}
+                  className="grid grid-cols-3 gap-2.5"
+                >
+                  {serverOptions.map((opt) => {
+                    const active = region === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        role="radio"
+                        aria-checked={active}
+                        onClick={() => setRegion(opt.id)}
+                        className={`group relative flex flex-col items-start justify-between rounded-xl border p-3 text-left transition ${
                           active
-                            ? "border-brand-400 bg-brand-500"
-                            : "border-slate-600 bg-transparent"
+                            ? "border-brand-500 bg-brand-600/15 shadow-sm shadow-brand-500/20"
+                            : "border-slate-800 bg-slate-950/90 hover:border-slate-700 hover:bg-slate-900"
                         }`}
                       >
-                        {active && (
-                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
-                        )}
-                      </span>
-                    </div>
-                    <div className="mt-2.5">
-                      <div
-                        className={`text-xs font-semibold ${
-                          active ? "text-white" : "text-slate-200"
-                        }`}
-                      >
-                        {opt.title}
-                      </div>
-                      <div className="text-[10px] text-slate-400">
-                        {opt.subtitle}
-                      </div>
-                    </div>
+                        <div className="flex w-full items-center justify-between">
+                          {opt.badge}
+                          <span
+                            className={`flex h-3.5 w-3.5 items-center justify-center rounded-full border ${
+                              active
+                                ? "border-brand-400 bg-brand-500"
+                                : "border-slate-600 bg-transparent"
+                            }`}
+                          >
+                            {active && (
+                              <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                            )}
+                          </span>
+                        </div>
+                        <div className="mt-2.5">
+                          <div
+                            className={`text-xs font-semibold ${
+                              active ? "text-white" : "text-slate-200"
+                            }`}
+                          >
+                            {opt.title}
+                          </div>
+                          <div className="text-[10px] text-slate-400">
+                            {opt.subtitle}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {region === "selfHosted" && (
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-slate-300">
+                    {t("auth.customServerUrl")}
+                  </label>
+                  <input
+                    type="url"
+                    required
+                    value={customServerUrl}
+                    onChange={(e) => setCustomServerUrl(e.target.value)}
+                    placeholder={t("auth.customServerPlaceholder")}
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
+                  />
+                </div>
+              )}
+
+              {/* Email */}
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-slate-300">
+                  {t("auth.email")}
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+                    <MailIcon size={16} />
+                  </div>
+                  <input
+                    type="email"
+                    required
+                    autoComplete="username"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t("auth.emailPlaceholder")}
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Master Password */}
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-slate-300">
+                  {t("auth.masterPassword")}
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+                    <LockIcon size={16} />
+                  </div>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    autoComplete="current-password"
+                    value={masterPassword}
+                    onChange={(e) => setMasterPassword(e.target.value)}
+                    placeholder={t("auth.masterPasswordPlaceholder")}
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-10 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    title={showPassword ? t("common.hide") : t("common.show")}
+                    className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-200"
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon size={16} />
+                    ) : (
+                      <EyeIcon size={16} />
+                    )}
                   </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {region === "selfHosted" && (
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-300">
-                {t("auth.customServerUrl")}
-              </label>
-              <input
-                type="url"
-                required
-                value={customServerUrl}
-                onChange={(e) => setCustomServerUrl(e.target.value)}
-                placeholder={t("auth.customServerPlaceholder")}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
-              />
-            </div>
-          )}
-
-          {/* Email */}
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
-              {t("auth.email")}
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
-                <MailIcon size={16} />
+                </div>
               </div>
-              <input
-                type="email"
-                required
-                autoComplete="username"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder={t("auth.emailPlaceholder")}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
-              />
-            </div>
-          </div>
 
-          {/* Master Password */}
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
-              {t("auth.masterPassword")}
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
-                <LockIcon size={16} />
+              <button
+                type="submit"
+                disabled={auth.isLoading}
+                className="mt-2 flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-500 disabled:opacity-50"
+              >
+                {auth.isLoading ? t("auth.loggingIn") : t("auth.loginButton")}
+              </button>
+            </form>
+          </>
+        ) : (
+          /* Step 2: Dedicated New Device Verification or Two-Factor Authentication Screen */
+          <>
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-600/20 text-brand-400">
+              {step === "newDevice" ? (
+                <MailCheckIcon size={24} />
+              ) : (
+                <KeyRoundIcon size={24} />
+              )}
+            </div>
+
+            <div className="mb-6 text-center">
+              <h1 className="text-xl font-bold text-white">
+                {step === "newDevice"
+                  ? t("auth.newDeviceStepTitle")
+                  : t("auth.twoFactorStepTitle")}
+              </h1>
+              <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                {step === "newDevice"
+                  ? t("auth.newDeviceStepSubtitle", { email: email.trim() })
+                  : t("auth.twoFactorStepSubtitle")}
+              </p>
+            </div>
+
+            {errorText && (
+              <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-500/40 bg-red-950/50 p-3 text-xs text-red-200">
+                <CircleAlertIcon
+                  size={16}
+                  className="mt-0.5 shrink-0 text-red-400"
+                />
+                <span>{errorText}</span>
               </div>
-              <input
-                type={showPassword ? "text" : "password"}
-                required
-                autoComplete="current-password"
-                value={masterPassword}
-                onChange={(e) => setMasterPassword(e.target.value)}
-                placeholder={t("auth.masterPasswordPlaceholder")}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-10 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
-              />
+            )}
+
+            <form
+              onSubmit={(e) => void handleVerificationSubmit(e)}
+              className="space-y-4"
+            >
+              <div>
+                <label className="mb-1.5 block text-xs font-medium text-slate-300">
+                  {step === "newDevice"
+                    ? t("auth.newDeviceCodeLabel")
+                    : t("auth.twoFactorCode")}
+                </label>
+                <div className="relative">
+                  <div className="pointer-events-none absolute left-3 top-2.5 text-brand-400">
+                    <KeyRoundIcon size={16} />
+                  </div>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    required
+                    autoFocus
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    placeholder={
+                      step === "newDevice"
+                        ? t("auth.newDeviceCodePlaceholder")
+                        : t("auth.twoFactorPlaceholder")
+                    }
+                    className="w-full rounded-lg border border-brand-500/60 bg-slate-950 py-2.5 pl-9 pr-3 font-mono text-base tracking-widest text-slate-100 placeholder-slate-500 focus:border-brand-400 focus:outline-none focus:ring-1 focus:ring-brand-500/40"
+                  />
+                </div>
+                {step === "twoFactor" && (
+                  <p className="mt-1.5 text-[11px] text-slate-500">
+                    {t("auth.twoFactorHint")}
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="submit"
+                disabled={auth.isLoading}
+                className="flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-500 disabled:opacity-50"
+              >
+                {auth.isLoading
+                  ? t("auth.loggingIn")
+                  : t("auth.verifyAndSignInButton")}
+              </button>
+
               <button
                 type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
-                title={showPassword ? t("common.hide") : t("common.show")}
-                className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-200"
+                onClick={handleBackToCredentials}
+                disabled={auth.isLoading}
+                className="flex w-full items-center justify-center rounded-lg border border-slate-700 bg-slate-800/60 px-4 py-2 text-xs font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white"
               >
-                {showPassword ? (
-                  <EyeOffIcon size={16} />
-                ) : (
-                  <EyeIcon size={16} />
-                )}
+                {t("auth.backToLoginButton")}
               </button>
-            </div>
-          </div>
-
-          {/* 2FA / New Device Verification Code */}
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
-              {t("auth.twoFactorCode")}{" "}
-              <span className="text-slate-500">({t("common.optional")})</span>
-            </label>
-            <div className="relative">
-              <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
-                <KeyRoundIcon size={16} />
-              </div>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={twoFactorCode}
-                onChange={(e) => setTwoFactorCode(e.target.value)}
-                placeholder={t("auth.twoFactorPlaceholder")}
-                className={`w-full rounded-lg border bg-slate-950 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none ${
-                  highlightCodeInput
-                    ? "border-amber-400 ring-1 ring-amber-400/40"
-                    : "border-slate-700 focus:border-brand-500"
-                }`}
-              />
-            </div>
-            <p className="mt-1 text-[11px] text-slate-500">
-              {t("auth.twoFactorHint")}
-            </p>
-          </div>
-
-          <button
-            type="submit"
-            disabled={auth.isLoading}
-            className="mt-2 flex w-full items-center justify-center rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-brand-600/25 transition hover:bg-brand-500 disabled:opacity-50"
-          >
-            {auth.isLoading ? t("auth.loggingIn") : t("auth.loginButton")}
-          </button>
-        </form>
+            </form>
+          </>
+        )}
       </div>
 
       {/* Footer */}

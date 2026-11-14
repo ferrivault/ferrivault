@@ -6,6 +6,7 @@ export interface LoginPayload {
   region: ServerRegion;
   customServerUrl?: string;
   twoFactorCode?: string;
+  newDeviceOtp?: string;
 }
 
 export interface AuthStatus {

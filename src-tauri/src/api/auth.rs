@@ -131,9 +131,8 @@ async fn send_token_form(
 /// Authenticates against `POST /identity/connect/token` using `grant_type=password`.
 ///
 /// Supports:
-/// - Standard Master Password authentication
-/// - TOTP Authenticator 2FA (`twoFactorProvider = 0`)
-/// - Email 2FA (`twoFactorProvider = 1`)
+/// - Standard Master Password authentication (step 1)
+/// - TOTP Authenticator 2FA (`twoFactorProvider = 0`) or Email 2FA (`twoFactorProvider = 1`)
 /// - Bitwarden New Device Verification OTP (`newDeviceOtp`)
 pub async fn login_with_password(
     client: &Client,
@@ -142,6 +141,7 @@ pub async fn login_with_password(
     master_password_hash: &str,
     device_id: &str,
     two_factor_token: Option<&str>,
+    new_device_otp: Option<&str>,
 ) -> Result<TokenResponse, AppError> {
     let url = format!("{}/connect/token", endpoints.identity_url);
     let auth_email_b64 = base64::Engine::encode(
@@ -149,7 +149,7 @@ pub async fn login_with_password(
         email.trim().as_bytes(),
     );
 
-    let base_form: Vec<(&str, String)> = vec![
+    let mut base_form: Vec<(&str, String)> = vec![
         ("scope", "api offline_access".to_string()),
         ("client_id", "desktop".to_string()),
         ("grant_type", "password".to_string()),
@@ -161,14 +161,18 @@ pub async fn login_with_password(
         ("deviceName", "Rustwarden Desktop".to_string()),
     ];
 
-    let clean_code = two_factor_token.map(str::trim).filter(|s| !s.is_empty());
+    if let Some(otp) = new_device_otp.map(str::trim).filter(|s| !s.is_empty()) {
+        base_form.push(("newDeviceOtp", otp.to_string()));
+        let (status, raw_body) = send_token_form(client, &url, &auth_email_b64, &base_form).await?;
+        if status.is_success() {
+            return serde_json::from_str::<TokenResponse>(&raw_body).map_err(|e| {
+                AppError::Network(format!("Failed to parse token response JSON: {e}"))
+            });
+        }
+        return Err(parse_token_failure(status, &raw_body));
+    }
 
-    // If the user supplied a verification code, try:
-    // 1. Authenticator TOTP (twoFactorProvider = 0)
-    // 2. New Device Verification OTP (newDeviceOtp)
-    // 3. Email 2FA (twoFactorProvider = 1)
-    if let Some(code) = clean_code {
-        // Attempt 1: TOTP Authenticator (provider 0)
+    if let Some(code) = two_factor_token.map(str::trim).filter(|s| !s.is_empty()) {
         let mut form_totp = base_form.clone();
         form_totp.push(("twoFactorToken", code.to_string()));
         form_totp.push(("twoFactorProvider", "0".to_string()));
@@ -181,19 +185,8 @@ pub async fn login_with_password(
             });
         }
 
-        // Attempt 2: New Device Verification OTP (newDeviceOtp)
-        let mut form_ndv = base_form.clone();
-        form_ndv.push(("newDeviceOtp", code.to_string()));
-        let (status_ndv, body_ndv) =
-            send_token_form(client, &url, &auth_email_b64, &form_ndv).await?;
-        if status_ndv.is_success() {
-            return serde_json::from_str::<TokenResponse>(&body_ndv).map_err(|e| {
-                AppError::Network(format!("Failed to parse token response JSON: {e}"))
-            });
-        }
-
-        // Attempt 3: Email 2FA (provider 1)
-        let mut form_email = base_form.clone();
+        // Fallback to Email 2FA (provider 1) if the account uses email-based 2FA
+        let mut form_email = base_form;
         form_email.push(("twoFactorToken", code.to_string()));
         form_email.push(("twoFactorProvider", "1".to_string()));
         form_email.push(("twoFactorRemember", "0".to_string()));
@@ -208,7 +201,7 @@ pub async fn login_with_password(
         return Err(parse_token_failure(status, &raw_body));
     }
 
-    // No verification code provided yet
+    // Step 1: No verification code provided yet
     let (status, raw_body) = send_token_form(client, &url, &auth_email_b64, &base_form).await?;
 
     if status.is_success() {

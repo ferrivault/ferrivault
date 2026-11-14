@@ -25,6 +25,7 @@ pub struct LoginPayload {
     pub region: ServerRegion,
     pub custom_server_url: Option<String>,
     pub two_factor_code: Option<String>,
+    pub new_device_otp: Option<String>,
 }
 
 /// Decrypts the user's `ProtectedSymmetricKey` (`EncString`) using the stretched master key.
@@ -96,6 +97,7 @@ pub async fn login(
         &password_hash,
         &state.device_id,
         payload.two_factor_code.as_deref(),
+        payload.new_device_otp.as_deref(),
     )
     .await?;
 
