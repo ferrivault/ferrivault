@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "skills": {
+    "rust-best-practices": {
+      "source": "apollographql/skills",
+      "sourceType": "github",
+      "skillPath": "skills/rust-best-practices/SKILL.md",
+      "computedHash": "7e12e68aa50152eb7ba9ea1f88ca5380c846ea0175f8ab6788bb79b7faf12ca0"
+    },
+    "rust-mcp-server-generator": {
+      "source": "github/awesome-copilot",
+      "sourceType": "github",
+      "skillPath": "skills/rust-mcp-server-generator/SKILL.md",
+      "computedHash": "6d340ffc7cbcb60447003d217b15c32c0dfacaacfaec7e0be057bb1aafc17984"
+    },
+    "tauri-development": {
+      "source": "Mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "tauri-development/SKILL.md",
+      "computedHash": "517703486a5db6423c3b2b4451c65321d3fa87e744e753f312d3e6989ce15ff9"
+    }
+  }
+}
