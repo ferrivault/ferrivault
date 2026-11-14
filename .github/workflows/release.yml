@@ -71,6 +71,33 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci
 
+      - name: Sync version from Git tag
+        if: github.ref_type == 'tag'
+        shell: bash
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const version = process.env.TAG_NAME.replace(/^v/, "");
+            if (!/^\d+\.\d+\.\d+/.test(version)) {
+              console.log("Skipping non-semver tag:", process.env.TAG_NAME);
+              process.exit(0);
+            }
+            for (const file of ["package.json", "src-tauri/tauri.conf.json"]) {
+              const data = JSON.parse(fs.readFileSync(file, "utf8"));
+              data.version = version;
+              fs.writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
+            }
+            const cargoPath = "src-tauri/Cargo.toml";
+            const cargo = fs.readFileSync(cargoPath, "utf8").replace(
+              /(\[package\][\s\S]*?^version\s*=\s*)"[^"]+"/m,
+              `$1"${version}"`
+            );
+            fs.writeFileSync(cargoPath, cargo);
+            console.log("Synced version to", version);
+          '
+
       - name: Build and upload Tauri release artifacts
         uses: tauri-apps/tauri-action@v0
         env:
