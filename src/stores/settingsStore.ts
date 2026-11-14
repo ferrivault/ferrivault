@@ -110,6 +110,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     const customThemes = parseCustomThemes(effective.customThemesJson);
     const activeTheme = findThemeById(effective.activeThemeId, customThemes);
+    effective.activeThemeId = activeTheme.id;
     applyThemeToDocument(activeTheme);
     await setAppLocale(effective.locale);
 

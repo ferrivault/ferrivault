@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 
 const host = process.env.TAURI_DEV_HOST;
 
-// https://vitejs.dev/config/
+// Vite configuration for FerriVault (Tauri v2 + React + TailwindCSS)
 export default defineConfig({
   plugins: [react()],
   clearScreen: false,

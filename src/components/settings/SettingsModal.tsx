@@ -329,7 +329,7 @@ export const SettingsModal: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-2.5">
                     {allThemes.map((th) => {
-                      const selected = th.id === activeThemeId;
+                      const selected = th.id === currentTheme.id;
                       return (
                         <div
                           key={th.id}
