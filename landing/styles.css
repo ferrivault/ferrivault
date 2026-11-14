@@ -15,11 +15,11 @@
 }
 
 :root {
-  --bg-deep: #020617;
-  --bg-panel: #0f172a;
-  --bg-card: #1e293b;
-  --bg-elevated: #283548;
-  --border: #334155;
+  --bg-deep: #04091a;
+  --bg-panel: #0b132b;
+  --bg-card: #131f3d;
+  --bg-elevated: #1c2c52;
+  --border: #25365e;
   --border-subtle: rgba(148, 163, 184, 0.16);
   --text-primary: #f1f5f9;
   --text-secondary: #94a3b8;
@@ -27,7 +27,10 @@
   --accent: #3b82f6;
   --accent-strong: #175ddc;
   --accent-light: #60a5fa;
-  --accent-glow: rgba(59, 130, 246, 0.28);
+  --accent-glow: rgba(23, 93, 220, 0.34);
+  --ferris: #f97316;
+  --ferris-light: #fb923c;
+  --ferris-glow: rgba(249, 115, 22, 0.16);
   --emerald: #10b981;
   --amber: #f59e0b;
   --danger: #ef4444;
@@ -38,68 +41,6 @@
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, SFMono-Regular, Menlo, monospace;
   color-scheme: dark;
-}
-
-:root[data-theme="emerald-vault"] {
-  --bg-deep: #02100c;
-  --bg-panel: #061c15;
-  --bg-card: #0d2b22;
-  --bg-elevated: #133c30;
-  --border: #164436;
-  --text-primary: #ecfdf5;
-  --text-secondary: #86efac;
-  --text-muted: #4b856d;
-  --accent: #10b981;
-  --accent-strong: #059669;
-  --accent-light: #34d399;
-  --accent-glow: rgba(16, 185, 129, 0.28);
-}
-
-:root[data-theme="catppuccin-mocha"] {
-  --bg-deep: #11111b;
-  --bg-panel: #181825;
-  --bg-card: #1e1e2e;
-  --bg-elevated: #29293d;
-  --border: #313244;
-  --text-primary: #cdd6f4;
-  --text-secondary: #a6adc8;
-  --text-muted: #6c7086;
-  --accent: #8b5cf6;
-  --accent-strong: #7c3aed;
-  --accent-light: #c4b5fd;
-  --accent-glow: rgba(139, 92, 246, 0.28);
-}
-
-:root[data-theme="amber-forge"] {
-  --bg-deep: #0c0a09;
-  --bg-panel: #1c1917;
-  --bg-card: #292524;
-  --bg-elevated: #383230;
-  --border: #44403c;
-  --text-primary: #fafaf9;
-  --text-secondary: #a8a29e;
-  --text-muted: #78716c;
-  --accent: #f59e0b;
-  --accent-strong: #d97706;
-  --accent-light: #fbbf24;
-  --accent-glow: rgba(245, 158, 11, 0.26);
-}
-
-:root[data-theme="daylight-clean"] {
-  --bg-deep: #f1f5f9;
-  --bg-panel: #ffffff;
-  --bg-card: #e2e8f0;
-  --bg-elevated: #cbd5e1;
-  --border: #cbd5e1;
-  --border-subtle: rgba(15, 23, 42, 0.12);
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #64748b;
-  --accent: #2563eb;
-  --accent-strong: #1d4ed8;
-  --accent-light: #3b82f6;
-  --accent-glow: rgba(37, 99, 235, 0.2);
-  color-scheme: light;
 }
 
 *,
@@ -125,7 +66,7 @@ body {
   background-color: var(--bg-deep);
   background-image:
     radial-gradient(circle at 18% 8%, var(--accent-glow), transparent 36%),
-    radial-gradient(circle at 82% 16%, rgba(16, 185, 129, 0.1), transparent 34%);
+    radial-gradient(circle at 82% 14%, var(--ferris-glow), transparent 34%);
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -191,14 +132,11 @@ a {
   letter-spacing: -0.02em;
 }
 
-.brand-mark {
-  width: 38px;
-  height: 38px;
+.brand-logo-img {
+  width: 40px;
+  height: 40px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--accent-strong), var(--accent-light));
-  display: grid;
-  place-items: center;
-  color: #ffffff;
+  object-fit: cover;
   box-shadow: 0 6px 20px var(--accent-glow);
 }
 
@@ -322,7 +260,7 @@ a {
 }
 
 .hero-title .gradient-text {
-  background: linear-gradient(135deg, var(--accent-light), #34d399);
+  background: linear-gradient(135deg, var(--accent-light), var(--ferris-light));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -728,45 +666,151 @@ a {
 .screenshots-showcase-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 1.5rem;
-  padding: 1.5rem;
-  background: var(--bg-deep);
+  gap: 1.75rem;
 }
 
 .screenshot-card {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.screenshot-card img {
+.screenshot-card:hover {
+  border-color: var(--accent-light);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 44px -16px rgba(0, 0, 0, 0.7);
+}
+
+.screenshot-thumb-btn {
+  position: relative;
+  display: block;
   width: 100%;
-  height: 240px;
+  padding: 0;
+  border: none;
+  background: var(--bg-deep);
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.screenshot-thumb-btn img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
   object-fit: cover;
   border-bottom: 1px solid var(--border);
-  cursor: zoom-in;
-  transition: transform 0.3s ease;
+  transition: transform 0.35s ease;
 }
 
-.screenshot-card img:hover {
-  transform: scale(1.02);
+.screenshot-thumb-btn:hover img {
+  transform: scale(1.03);
+}
+
+.screenshot-zoom-pill {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  background: rgba(4, 9, 26, 0.85);
+  color: #f1f5f9;
+  border: 1px solid rgba(96, 165, 250, 0.45);
+  border-radius: 999px;
+  padding: 0.28rem 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
 }
 
 .screenshot-caption {
-  padding: 1rem 1.15rem;
+  padding: 1.2rem 1.3rem;
 }
 
-.screenshot-caption h4 {
-  font-size: 0.98rem;
-  margin-bottom: 0.25rem;
+.screenshot-caption h3 {
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
 }
 
 .screenshot-caption p {
-  font-size: 0.84rem;
+  font-size: 0.88rem;
   color: var(--text-secondary);
+}
+
+/* ==========================================================================
+   4b. Native Full-Size Image Lightbox (<dialog>)
+   ========================================================================== */
+
+dialog.image-lightbox {
+  margin: auto;
+  max-width: min(94vw, 1280px);
+  max-height: 92vh;
+  width: auto;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  color: var(--text-primary);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.85);
+  overflow: hidden;
+}
+
+dialog.image-lightbox:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.image-lightbox::backdrop {
+  background: rgba(4, 9, 26, 0.82);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-deep);
+}
+
+.lightbox-title {
+  font-size: 0.96rem;
+  font-weight: 700;
+}
+
+.lightbox-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lightbox-body {
+  padding: 1rem;
+  background: var(--bg-deep);
+  display: grid;
+  place-items: center;
+}
+
+.lightbox-body img {
+  display: block;
+  max-width: 100%;
+  max-height: 76vh;
+  width: auto;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.lightbox-desc {
+  padding: 0.85rem 1.25rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  border-top: 1px solid var(--border);
+  background: var(--bg-panel);
 }
 
 /* ==========================================================================

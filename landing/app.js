@@ -7,14 +7,14 @@ const MOCK_VAULT_ITEMS = [
   {
     id: "github-ent",
     name: "GitHub Enterprise",
-    subtitle: "victor@ferrivault.app",
+    subtitle: "dev@ferrivault.app",
     category: "login",
     favorite: true,
     folder: "Development",
     badge: "Login • Organization",
     avatarBg: "linear-gradient(135deg, #1e293b, #334155)",
     avatarText: "GH",
-    username: "victor@ferrivault.app",
+    username: "dev@ferrivault.app",
     password: "fv!9K#mP2$vL8@nQ4_xR7",
     uri: "https://github.com/ferrivault",
     totpBase: "482 910",
@@ -62,7 +62,7 @@ const MOCK_VAULT_ITEMS = [
     badge: "Payment Card • Visa",
     avatarBg: "linear-gradient(135deg, #059669, #10b981)",
     avatarText: "VI",
-    username: "VICTOR GUARDIOLA",
+    username: "ACME CORP",
     password: "4532 •••• •••• 8492  (CVV: 941)",
     uri: "Exp: 09 / 2029",
     totpBase: null,
@@ -95,10 +95,9 @@ const DICEWARE_WORDS = [
 
 document.addEventListener("DOMContentLoaded", () => {
   initToastSystem();
-  initThemeSwitcher();
   initOsDownloadDetector();
   initMockVaultSimulator();
-  initHeroShowcaseToggle();
+  initImageLightbox();
   initAccessibleTabs();
   initLivePasswordGenerator();
   initScrollAnimationFallbacks();
@@ -132,43 +131,6 @@ function initToastSystem() {
 }
 
 /* ==========================================================================
-   Live Theme Switcher (Syncs Landing Page + App Preview)
-   ========================================================================== */
-function initThemeSwitcher() {
-  const selectors = document.querySelectorAll("[data-theme-selector]");
-  selectors.forEach((select) => {
-    select.addEventListener("change", (e) => {
-      const themeId = e.target.value;
-      applyTheme(themeId);
-      selectors.forEach((other) => {
-        if (other !== e.target) other.value = themeId;
-      });
-    });
-  });
-
-  document.querySelectorAll("[data-theme-preset]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const themeId = btn.getAttribute("data-theme-preset");
-      if (!themeId) return;
-      applyTheme(themeId);
-      selectors.forEach((s) => {
-        s.value = themeId;
-      });
-    });
-  });
-}
-
-function applyTheme(themeId) {
-  const root = document.documentElement;
-  if (themeId === "ferrivault-dark") {
-    root.removeAttribute("data-theme");
-  } else {
-    root.setAttribute("data-theme", themeId);
-  }
-  showLandingToast(`Applied theme: ${themeId}`);
-}
-
-/* ==========================================================================
    Automatic OS Detection for Primary Download CTA
    ========================================================================== */
 function initOsDownloadDetector() {
@@ -185,29 +147,72 @@ function initOsDownloadDetector() {
 }
 
 /* ==========================================================================
-   Hero Showcase Mode Switcher (Interactive Simulator vs Screenshots Gallery)
+   Full-Size Screenshot Lightbox (<dialog> with light-dismiss & fallback)
    ========================================================================== */
-function initHeroShowcaseToggle() {
-  const modeButtons = document.querySelectorAll("[data-showcase-mode]");
-  const simulatorView = document.getElementById("showcase-simulator-view");
-  const galleryView = document.getElementById("showcase-gallery-view");
-  if (!simulatorView || !galleryView) return;
+function initImageLightbox() {
+  const dialog = document.getElementById("image-lightbox");
+  const imgEl = document.getElementById("lightbox-img");
+  const titleEl = document.getElementById("lightbox-title");
+  const descEl = document.getElementById("lightbox-desc");
+  const closeBtn = document.getElementById("lightbox-close");
+  const prevBtn = document.getElementById("lightbox-prev");
+  const nextBtn = document.getElementById("lightbox-next");
+  const triggers = Array.from(document.querySelectorAll("[data-lightbox-src]"));
 
-  modeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const mode = btn.getAttribute("data-showcase-mode");
-      modeButtons.forEach((b) =>
-        b.setAttribute("aria-pressed", String(b === btn))
-      );
-      if (mode === "gallery") {
-        simulatorView.hidden = true;
-        galleryView.hidden = false;
-      } else {
-        simulatorView.hidden = false;
-        galleryView.hidden = true;
-      }
+  if (!dialog || !imgEl || triggers.length === 0) return;
+
+  let currentIndex = 0;
+
+  function showSlide(index) {
+    currentIndex = (index + triggers.length) % triggers.length;
+    const item = triggers[currentIndex];
+    const src = item.getAttribute("data-lightbox-src") || "";
+    const alt = item.getAttribute("data-lightbox-alt") || "FerriVault screenshot";
+    const title = item.getAttribute("data-lightbox-title") || "FerriVault";
+    const desc = item.getAttribute("data-lightbox-desc") || "";
+
+    imgEl.src = src;
+    imgEl.alt = alt;
+    if (titleEl) titleEl.textContent = title;
+    if (descEl) descEl.textContent = desc;
+  }
+
+  triggers.forEach((trigger, idx) => {
+    trigger.addEventListener("click", () => {
+      showSlide(idx);
+      dialog.showModal();
     });
   });
+
+  prevBtn?.addEventListener("click", () => showSlide(currentIndex - 1));
+  nextBtn?.addEventListener("click", () => showSlide(currentIndex + 1));
+  closeBtn?.addEventListener("click", () => dialog.close());
+
+  dialog.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      showSlide(currentIndex - 1);
+    } else if (e.key === "ArrowRight") {
+      e.preventDefault();
+      showSlide(currentIndex + 1);
+    }
+  });
+
+  // Fallback for browsers without native `closedby="any"` support (e.g. Safari)
+  if (!("closedBy" in HTMLDialogElement.prototype)) {
+    dialog.addEventListener("click", (event) => {
+      if (event.target !== dialog) return;
+      const rect = dialog.getBoundingClientRect();
+      const isDialogContent =
+        rect.top <= event.clientY &&
+        event.clientY <= rect.top + rect.height &&
+        rect.left <= event.clientX &&
+        event.clientX <= rect.left + rect.width;
+      if (!isDialogContent) {
+        dialog.close();
+      }
+    });
+  }
 }
 
 /* ==========================================================================
