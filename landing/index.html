@@ -1,0 +1,775 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FerriVault — Fast, Memory-Safe Desktop Client for Bitwarden &amp; Vaultwarden</title>
+    <meta
+      name="description"
+      content="FerriVault is a native, memory-safe desktop password manager for Bitwarden and Vaultwarden built with Rust, Tauri v2, and RustCrypto."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <!-- Fixed Shrinking Header -->
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="#" class="brand-logo">
+          <span class="brand-mark" aria-hidden="true">FV</span>
+          <span>FerriVault</span>
+        </a>
+
+        <nav class="nav-links" aria-label="Main navigation">
+          <a href="#interactive-demo">Live Vault Demo</a>
+          <a href="#deep-dive">Architecture &amp; Tools</a>
+          <a href="#screenshots">Screenshots</a>
+          <a href="#comparison">Why Rust + Tauri?</a>
+        </nav>
+
+        <div class="header-actions">
+          <select
+            class="theme-pill-select"
+            data-theme-selector
+            aria-label="Preview application color theme"
+          >
+            <option value="ferrivault-dark">Theme: FerriVault Cobalt</option>
+            <option value="emerald-vault">Theme: Emerald Vault</option>
+            <option value="catppuccin-mocha">Theme: Catppuccin Violet</option>
+            <option value="amber-forge">Theme: Amber Forge</option>
+            <option value="daylight-clean">Theme: Daylight Clean</option>
+          </select>
+
+          <a
+            href="https://github.com/ferrivault/ferrivault"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-secondary"
+          >
+            GitHub
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <!-- Hero Section -->
+      <section class="hero container">
+        <div class="hero-badge">
+          <span class="badge-dot" aria-hidden="true"></span>
+          <span>v0.1.0 Open Source (GPL-3.0) • Built with Rust &amp; Tauri v2</span>
+        </div>
+
+        <h1 class="hero-title">
+          Your Bitwarden &amp; Vaultwarden Vault,
+          <span class="gradient-text">Forged in Native Rust.</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          FerriVault isolates every cryptographic key derivation, AES-256-CBC-HMAC
+          decryption, live TOTP code, and clipboard wipe strictly inside a
+          memory-safe Rust backend—using a fraction of the RAM of Electron clients.
+        </p>
+
+        <div class="hero-cta-group">
+          <a
+            href="https://github.com/ferrivault/ferrivault/releases"
+            class="btn btn-primary btn-lg"
+          >
+            <span id="primary-os-label">Download FerriVault Desktop</span>
+          </a>
+          <button
+            type="button"
+            class="btn btn-secondary btn-lg"
+            data-copy-text="git clone https://github.com/ferrivault/ferrivault.git && cd ferrivault && make dev"
+          >
+            <span>$ git clone &amp;&amp; make dev</span>
+          </button>
+        </div>
+
+        <div class="hero-meta-strip">
+          <span>✓ Official Bitwarden US / EU &amp; Self-Hosted Vaultwarden</span>
+          <span>✓ PBKDF2-SHA256 &amp; Argon2id + ZeroizeOnDrop</span>
+          <span>✓ Linux (Wayland/X11), macOS &amp; Windows</span>
+          <span>✓ English, Español &amp; Català</span>
+        </div>
+
+        <!-- Mode Switcher: Interactive App Simulator vs Product Screenshots -->
+        <div id="interactive-demo">
+          <div class="showcase-mode-bar" role="group" aria-label="Preview mode">
+            <button
+              type="button"
+              class="showcase-mode-btn"
+              data-showcase-mode="simulator"
+              aria-pressed="true"
+            >
+              Interactive Live Vault Simulator
+            </button>
+            <button
+              type="button"
+              class="showcase-mode-btn"
+              data-showcase-mode="gallery"
+              aria-pressed="false"
+            >
+              High-Res Product Captures
+            </button>
+          </div>
+
+          <div class="app-window-frame">
+            <div class="window-titlebar">
+              <div class="window-dots" aria-hidden="true">
+                <span class="window-dot red"></span>
+                <span class="window-dot yellow"></span>
+                <span class="window-dot green"></span>
+              </div>
+              <div class="window-title">
+                <span>FerriVault — app.ferrivault.desktop</span>
+              </div>
+              <span class="window-status-pill">Vault Unlocked • Zeroize Armed</span>
+            </div>
+
+            <!-- View 1: Interactive 3-Pane Vault Simulator -->
+            <div id="showcase-simulator-view" class="mock-vault-grid">
+              <!-- Pane 1: Sidebar -->
+              <aside class="mock-sidebar" aria-label="Mock vault navigation">
+                <div>
+                  <div class="mock-section-label">Vaults</div>
+                  <button
+                    type="button"
+                    class="mock-nav-btn active"
+                    data-vault-filter="all"
+                  >
+                    <span>All Vaults</span>
+                    <span class="mock-count">5</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="mock-nav-btn"
+                    data-vault-filter="favorites"
+                  >
+                    <span>★ Favorites</span>
+                    <span class="mock-count">3</span>
+                  </button>
+                </div>
+
+                <div>
+                  <div class="mock-section-label">Cipher Types</div>
+                  <button
+                    type="button"
+                    class="mock-nav-btn"
+                    data-vault-filter="login"
+                  >
+                    <span>Logins</span>
+                    <span class="mock-count">3</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="mock-nav-btn"
+                    data-vault-filter="card"
+                  >
+                    <span>Payment Cards</span>
+                    <span class="mock-count">1</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="mock-nav-btn"
+                    data-vault-filter="note"
+                  >
+                    <span>Secure Notes</span>
+                    <span class="mock-count">1</span>
+                  </button>
+                </div>
+
+                <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
+                  <div class="mock-section-label">Server Connection</div>
+                  <div style="padding: 0.35rem 0.55rem; font-size: 0.78rem; color: var(--text-secondary);">
+                    vault.ferrivault.app (Self-Hosted)
+                  </div>
+                </div>
+              </aside>
+
+              <!-- Pane 2: Search & Cipher List -->
+              <div class="mock-list-pane">
+                <div class="mock-search-bar">
+                  <input
+                    id="mock-search-input"
+                    type="search"
+                    class="mock-search-input"
+                    placeholder="Search mock vault (e.g. GitHub, Cloudflare, Visa)..."
+                    aria-label="Search mock vault items"
+                  />
+                </div>
+                <div id="mock-cipher-list" class="mock-cipher-items"></div>
+              </div>
+
+              <!-- Pane 3: Decrypted Item Details -->
+              <div class="mock-detail-pane">
+                <div class="detail-header">
+                  <div class="detail-header-left">
+                    <div
+                      id="mock-detail-avatar"
+                      class="cipher-avatar"
+                      style="width: 44px; height: 44px; font-size: 1rem;"
+                    >
+                      GH
+                    </div>
+                    <div>
+                      <h2 id="mock-detail-title" class="detail-title">
+                        GitHub Enterprise
+                      </h2>
+                      <span id="mock-detail-badge" class="detail-badge">
+                        Login • Organization
+                      </span>
+                    </div>
+                  </div>
+                  <span class="window-status-pill">AES-256-CBC + HMAC</span>
+                </div>
+
+                <div class="field-box">
+                  <div>
+                    <div class="field-label">Username / Identifier</div>
+                    <div id="mock-detail-username" class="field-value">
+                      victor@ferrivault.app
+                    </div>
+                  </div>
+                  <div class="field-actions">
+                    <button type="button" id="mock-copy-user" class="icon-btn">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div class="field-box">
+                  <div>
+                    <div class="field-label">Master-Key Protected Secret</div>
+                    <div id="mock-detail-password" class="field-value mono">
+                      ••••••••••••••••••••
+                    </div>
+                  </div>
+                  <div class="field-actions">
+                    <button type="button" id="mock-toggle-pass" class="icon-btn">
+                      Reveal
+                    </button>
+                    <button type="button" id="mock-copy-pass" class="icon-btn">
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div id="mock-totp-box" class="field-box totp-live-box">
+                  <div>
+                    <div class="field-label">
+                      Verification Code (RFC 6238 TOTP)
+                    </div>
+                    <div id="mock-totp-code" class="totp-code-display">
+                      482 910
+                    </div>
+                  </div>
+                  <div class="totp-ring-wrap">
+                    <span id="mock-totp-timer" class="totp-timer-pill">24s</span>
+                    <button type="button" id="mock-copy-totp" class="icon-btn">
+                      Copy 2FA
+                    </button>
+                  </div>
+                </div>
+
+                <div class="field-box">
+                  <div>
+                    <div class="field-label">Associated URI / Metadata</div>
+                    <div id="mock-detail-uri" class="field-value">
+                      https://github.com/ferrivault
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field-box">
+                  <div>
+                    <div class="field-label">Encrypted Vault Notes</div>
+                    <div
+                      id="mock-detail-notes"
+                      class="field-value"
+                      style="font-size: 0.86rem; color: var(--text-secondary);"
+                    >
+                      Hardware security key + TOTP backup enabled.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- View 2: High-Resolution Generated Product Screenshots -->
+            <div id="showcase-gallery-view" hidden>
+              <div class="screenshots-showcase-grid">
+                <article class="screenshot-card">
+                  <img
+                    src="./assets/ferrivault-hero-vault.jpg"
+                    alt="FerriVault 3-pane desktop vault interface showing GitHub Enterprise login and live TOTP code"
+                    loading="lazy"
+                  />
+                  <div class="screenshot-caption">
+                    <h4>3-Pane Desktop Vault &amp; Live TOTP</h4>
+                    <p>
+                      Instant filtering across Personal and Organization vaults,
+                      domain favicons, and real-time 2FA code generation.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="screenshot-card">
+                  <img
+                    src="./assets/ferrivault-generator.jpg"
+                    alt="FerriVault CSPRNG Password and EFF Diceware Passphrase Generator modal"
+                    loading="lazy"
+                  />
+                  <div class="screenshot-caption">
+                    <h4>CSPRNG Password &amp; Diceware Generator</h4>
+                    <p>
+                      Generate high-entropy passwords and EFF Diceware
+                      passphrases backed by the OS cryptographic RNG in Rust.
+                    </p>
+                  </div>
+                </article>
+
+                <article class="screenshot-card">
+                  <img
+                    src="./assets/ferrivault-themes.jpg"
+                    alt="FerriVault customizable theme engine showing Cobalt, Emerald, Amber, and Daylight themes"
+                    loading="lazy"
+                  />
+                  <div class="screenshot-caption">
+                    <h4>Multi-Theme Engine &amp; Custom JSON</h4>
+                    <p>
+                      Switch effortlessly between built-in palettes or import
+                      custom JSON themes with live typography and width sliders.
+                    </p>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Accessible Interactive Feature Tabs -->
+      <section id="deep-dive" class="section container">
+        <div class="section-header">
+          <div class="section-eyebrow">Engineered for Zero-Trust</div>
+          <h2 class="section-title">Explore the FerriVault Architecture</h2>
+          <p class="section-desc">
+            Every sensitive operation happens strictly inside compiled Rust.
+            Switch tabs below to inspect the cryptographic pipeline, live
+            generator, and theme engine.
+          </p>
+        </div>
+
+        <div class="tabs-container">
+          <div
+            class="tablist-scroller"
+            focusgroup="tablist nomemory"
+            aria-label="FerriVault core capabilities"
+          >
+            <button
+              type="button"
+              id="tab-crypto"
+              class="tab-btn"
+              role="tab"
+              aria-selected="true"
+              focusgroupstart
+            >
+              1. RustCrypto &amp; Zeroize
+            </button>
+            <button
+              type="button"
+              id="tab-generator"
+              class="tab-btn"
+              role="tab"
+              aria-selected="false"
+            >
+              2. Live CSPRNG Generator
+            </button>
+            <button
+              type="button"
+              id="tab-themes"
+              class="tab-btn"
+              role="tab"
+              aria-selected="false"
+            >
+              3. Theme Engine &amp; i18n
+            </button>
+          </div>
+
+          <div class="tabpanels-stack">
+            <!-- Panel 1: RustCrypto -->
+            <div
+              role="tabpanel"
+              aria-labelledby="tab-crypto"
+              tabindex="0"
+            >
+              <div class="tabpanel-card">
+                <div class="tabpanel-content">
+                  <h3>Strict Separation of Privileges</h3>
+                  <p>
+                    Your Master Password and derived keys never sit in the
+                    WebView's JavaScript heap. FerriVault derives your 32-byte
+                    Master Key via <strong>PBKDF2-HMAC-SHA256</strong> (600,000+
+                    iterations) or <strong>Argon2id</strong>, stretches it with
+                    <strong>HKDF-Expand</strong>, and verifies every
+                    <code>EncString</code> MAC in constant time.
+                  </p>
+                  <ul class="feature-checklist">
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Automatic Memory Wiping:</strong> All key structs
+                        derive <code>zeroize::ZeroizeOnDrop</code>. Locking the
+                        vault overwrites key bytes in RAM immediately.
+                      </span>
+                    </li>
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Smart Clipboard Hygiene:</strong> Copied secrets
+                        are hashed and automatically wiped from the OS clipboard
+                        after 30 seconds only if untouched.
+                      </span>
+                    </li>
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Offline Unlock &amp; Inactivity Auto-Lock:</strong>
+                        Unlock your cached encrypted vault locally and configure
+                        custom inactivity timeouts.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                <div class="tabpanel-visual">
+                  <img
+                    src="./assets/ferrivault-hero-vault.jpg"
+                    alt="FerriVault main vault view with AES-256-CBC + HMAC-SHA256 encryption"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 2: Interactive Password Generator + Image -->
+            <div
+              role="tabpanel"
+              aria-labelledby="tab-generator"
+              hidden="until-found"
+            >
+              <div class="tabpanel-card">
+                <div class="tabpanel-content">
+                  <h3>Try the Credential Generator Live</h3>
+                  <p>
+                    Test the interactive credential generator below, or inspect
+                    how FerriVault builds high-entropy passwords and EFF
+                    Diceware passphrases inside the desktop app.
+                  </p>
+
+                  <div class="live-generator-box">
+                    <div style="display: flex; gap: 0.5rem;">
+                      <button
+                        type="button"
+                        id="demo-mode-password"
+                        class="btn btn-primary"
+                        style="flex: 1; padding: 0.45rem;"
+                      >
+                        Random Password
+                      </button>
+                      <button
+                        type="button"
+                        id="demo-mode-passphrase"
+                        class="btn btn-secondary"
+                        style="flex: 1; padding: 0.45rem;"
+                      >
+                        Diceware Passphrase
+                      </button>
+                    </div>
+
+                    <div class="gen-output-display">
+                      <span id="demo-gen-output">K9#mP2$vL8@nQ4!xR7&amp;wZ</span>
+                      <div style="display: flex; gap: 0.4rem;">
+                        <button
+                          type="button"
+                          id="demo-gen-refresh"
+                          class="icon-btn"
+                        >
+                          Regenerate
+                        </button>
+                        <button
+                          type="button"
+                          id="demo-gen-copy"
+                          class="icon-btn"
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="gen-controls-row">
+                      <label for="demo-gen-length">
+                        Length: <strong id="demo-gen-length-val">22</strong>
+                      </label>
+                      <input
+                        id="demo-gen-length"
+                        type="range"
+                        min="8"
+                        max="40"
+                        value="22"
+                        style="flex: 1; accent-color: var(--accent);"
+                      />
+                    </div>
+
+                    <div class="gen-checkbox-grid">
+                      <label>
+                        <input id="demo-chk-upper" type="checkbox" checked />
+                        A–Z Uppercase
+                      </label>
+                      <label>
+                        <input id="demo-chk-lower" type="checkbox" checked />
+                        a–z Lowercase
+                      </label>
+                      <label>
+                        <input id="demo-chk-num" type="checkbox" checked />
+                        0–9 Numbers
+                      </label>
+                      <label>
+                        <input id="demo-chk-sym" type="checkbox" checked />
+                        !@#$ Symbols
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tabpanel-visual">
+                  <img
+                    src="./assets/ferrivault-generator.jpg"
+                    alt="FerriVault built-in password and passphrase generator modal"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 3: Themes & Localization -->
+            <div
+              role="tabpanel"
+              aria-labelledby="tab-themes"
+              hidden="until-found"
+            >
+              <div class="tabpanel-card">
+                <div class="tabpanel-content">
+                  <h3>Customizable Themes &amp; Native i18n</h3>
+                  <p>
+                    Click any preset below to re-theme this entire page and the
+                    embedded simulator on the fly. In the desktop app, you can
+                    also export a JSON template and import your own custom color
+                    palettes and panel dimensions.
+                  </p>
+
+                  <div
+                    style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-bottom: 1.25rem;"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-theme-preset="ferrivault-dark"
+                    >
+                      FerriVault Cobalt
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-theme-preset="emerald-vault"
+                    >
+                      Emerald Vault
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-theme-preset="catppuccin-mocha"
+                    >
+                      Catppuccin Violet
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-theme-preset="amber-forge"
+                    >
+                      Amber Forge
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-secondary"
+                      data-theme-preset="daylight-clean"
+                    >
+                      Daylight Clean
+                    </button>
+                  </div>
+
+                  <ul class="feature-checklist">
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Multi-Language Out of the Box:</strong> Full
+                        translations for English (<code>en</code>), Spanish
+                        (<code>es</code>), and Catalan (<code>ca</code>) with
+                        live OS system tray synchronization.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="tabpanel-visual">
+                  <img
+                    src="./assets/ferrivault-themes.jpg"
+                    alt="FerriVault theme showcase across Cobalt, Emerald, Amber, and Daylight Clean"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Screenshots & Visual Bento Section -->
+      <section id="screenshots" class="section container">
+        <div class="section-header">
+          <div class="section-eyebrow">Built for Daily Workflows</div>
+          <h2 class="section-title">Everything You Need in a Desktop Vault</h2>
+          <p class="section-desc">
+            Designed for developers, sysadmins, and privacy-conscious teams
+            running Bitwarden Official or self-hosted Vaultwarden.
+          </p>
+        </div>
+
+        <div class="bento-grid">
+          <article class="bento-card scroll-reveal">
+            <div class="bento-icon" aria-hidden="true">🦀</div>
+            <h3>Zeroize-On-Drop Cryptography</h3>
+            <p>
+              All master keys, stretched HKDF keys, and decrypted buffers use
+              <code>zeroize</code> in Rust so secrets are overwritten in memory
+              the instant the vault locks.
+            </p>
+          </article>
+
+          <article class="bento-card scroll-reveal">
+            <div class="bento-icon" aria-hidden="true">🏢</div>
+            <h3>Organizations &amp; Collections</h3>
+            <p>
+              Switch seamlessly between your Personal Vault and Organization
+              Vaults, assign items to shared Collections, and inspect password
+              change history.
+            </p>
+          </article>
+
+          <article class="bento-card scroll-reveal">
+            <div class="bento-icon" aria-hidden="true">⚡</div>
+            <h3>Keyboard-First Navigation</h3>
+            <p>
+              Trigger global search with <code>Ctrl+K</code>, create items with
+              <code>Ctrl+N</code>, open the generator with <code>Ctrl+G</code>,
+              lock with <code>Ctrl+L</code>, or open settings with
+              <code>Ctrl+,</code>.
+            </p>
+          </article>
+
+          <article class="bento-card scroll-reveal">
+            <div class="bento-icon" aria-hidden="true">🖥️</div>
+            <h3>Native Linux Wayland &amp; Tray</h3>
+            <p>
+              Includes StatusNotifierItem (<code>ksni</code>) tray support on
+              KDE Plasma &amp; GNOME, left-click window toggle, and automatic
+              Wayland <code>.desktop</code> icon registration.
+            </p>
+          </article>
+
+          <article class="bento-card scroll-reveal">
+            <div class="bento-icon" aria-hidden="true">🔐</div>
+            <h3>Built-in TOTP Authenticator</h3>
+            <p>
+              Parses standard <code>otpauth://</code> URIs and raw Base32
+              secrets with SHA-1, SHA-256, and SHA-512 support and a live
+              countdown indicator.
+            </p>
+          </article>
+
+          <article class="bento-card scroll-reveal">
+            <div class="bento-icon" aria-hidden="true">🌍</div>
+            <h3>1-File Community i18n</h3>
+            <p>
+              Adding a new language requires copying a single JSON dictionary and
+              verifying 100% key parity with <code>make test-i18n</code>.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Technical Comparison Section -->
+      <section id="comparison" class="section container">
+        <div class="section-header">
+          <div class="section-eyebrow">Lightweight by Design</div>
+          <h2 class="section-title">FerriVault vs. Electron Password Managers</h2>
+        </div>
+
+        <div class="comparison-table-wrap scroll-reveal">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Metric / Capability</th>
+                <th>FerriVault (Tauri v2 + Rust)</th>
+                <th>Traditional Electron Client</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cryptographic Execution</strong></td>
+                <td class="highlight-col">Native Rust (RustCrypto + ZeroizeOnDrop)</td>
+                <td>JavaScript / WebCrypto inside V8 Heap</td>
+              </tr>
+              <tr>
+                <td><strong>Idle Memory Footprint</strong></td>
+                <td class="highlight-col">~45 MB RAM (OS Native WebView)</td>
+                <td>~350 – 520 MB RAM (Bundled Chromium)</td>
+              </tr>
+              <tr>
+                <td><strong>Application Bundle Size</strong></td>
+                <td class="highlight-col">~10 – 14 MB</td>
+                <td>~160 – 220 MB</td>
+              </tr>
+              <tr>
+                <td><strong>Custom JSON Theme Engine</strong></td>
+                <td class="highlight-col">Built-in + 1-Click JSON Template Export</td>
+                <td>Fixed Dark / Light themes only</td>
+              </tr>
+              <tr>
+                <td><strong>License</strong></td>
+                <td class="highlight-col">100% Free &amp; Open Source (GPL-3.0)</td>
+                <td>Mixed / Proprietary SDK components</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <div>
+          <strong>FerriVault</strong> (`app.ferrivault.desktop`) — Copyright ©
+          2026 Victor Guardiola. Released under the GNU GPL v3.0 License.
+        </div>
+        <div style="display: flex; gap: 1.25rem;">
+          <a href="https://github.com/ferrivault/ferrivault" target="_blank" rel="noopener noreferrer">GitHub Organization</a>
+          <a href="https://github.com/ferrivault/ferrivault/blob/main/README.md" target="_blank" rel="noopener noreferrer">Documentation</a>
+          <a href="https://github.com/ferrivault/ferrivault/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GPL-3.0 License</a>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Floating Toast Notification -->
+    <div id="landing-toast" class="landing-toast" role="status" aria-live="polite"></div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
