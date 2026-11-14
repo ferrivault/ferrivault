@@ -48,6 +48,182 @@
     <main>
       <!-- Hero Section -->
       <section class="hero container">
+        <!-- Animated FerriVault Mascot + Vault Logo -->
+        <button
+          type="button"
+          id="hero-animated-logo"
+          class="hero-logo-stage is-playing"
+          aria-label="Replay FerriVault vault unlock animation"
+          title="Click to replay animation"
+        >
+          <svg
+            class="hero-ferrivault-svg"
+            viewBox="0 0 200 200"
+            width="136"
+            height="136"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <defs>
+              <linearGradient id="fv-bg-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#132347" />
+                <stop offset="100%" stop-color="#060d1f" />
+              </linearGradient>
+              <linearGradient id="fv-ferris-grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#fb923c" />
+                <stop offset="100%" stop-color="#ea580c" />
+              </linearGradient>
+              <linearGradient id="fv-silver-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#e2e8f0" />
+                <stop offset="50%" stop-color="#94a3b8" />
+                <stop offset="100%" stop-color="#cbd5e1" />
+              </linearGradient>
+              <linearGradient id="fv-cobalt-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#3b82f6" />
+                <stop offset="100%" stop-color="#175ddc" />
+              </linearGradient>
+              <clipPath id="fv-squircle-clip">
+                <rect x="10" y="10" width="180" height="180" rx="40" />
+              </clipPath>
+              <!-- Clip Ferris so he stays hidden inside the vault bounds until emerging -->
+              <clipPath id="fv-ferris-emerge-clip">
+                <rect x="16" y="12" width="168" height="72" />
+              </clipPath>
+            </defs>
+
+            <!-- Squircle App Icon Background -->
+            <rect
+              x="10"
+              y="10"
+              width="180"
+              height="180"
+              rx="40"
+              fill="url(#fv-bg-grad)"
+              stroke="#253b6e"
+              stroke-width="2.5"
+            />
+
+            <g clip-path="url(#fv-squircle-clip)">
+              <!-- Ferris Emerging from Behind the Vault Door -->
+              <g clip-path="url(#fv-ferris-emerge-clip)">
+                <g class="fv-ferris-body">
+                  <!-- Left Arm & Claw -->
+                  <g class="fv-claw-left">
+                    <path
+                      d="M66 76 C52 72, 42 64, 38 54"
+                      stroke="#c2410c"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                      fill="none"
+                    />
+                    <path
+                      d="M36 56 C24 52, 22 36, 30 28 C33 36, 37 38, 41 36 C41 30, 44 26, 48 28 C52 38, 48 54, 36 56 Z"
+                      fill="url(#fv-ferris-grad)"
+                      stroke="#7c2d12"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                  </g>
+
+                  <!-- Right Arm & Claw -->
+                  <g class="fv-claw-right">
+                    <path
+                      d="M134 76 C148 72, 158 64, 162 54"
+                      stroke="#c2410c"
+                      stroke-width="6"
+                      stroke-linecap="round"
+                      fill="none"
+                    />
+                    <path
+                      d="M164 56 C176 52, 178 36, 170 28 C167 36, 163 38, 159 36 C159 30, 156 26, 152 28 C148 38, 152 54, 164 56 Z"
+                      fill="url(#fv-ferris-grad)"
+                      stroke="#7c2d12"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                  </g>
+
+                  <!-- Spiky Carapace Dome -->
+                  <path
+                    d="M58 84 C58 58, 70 42, 76 42 L80 35 L86 40 L92 32 L100 38 L108 32 L114 40 L120 35 L124 42 C130 42, 142 58, 142 84 Z"
+                    fill="url(#fv-ferris-grad)"
+                    stroke="#7c2d12"
+                    stroke-width="2.2"
+                    stroke-linejoin="round"
+                  />
+
+                  <!-- Eyes with Blink Animation -->
+                  <g class="fv-ferris-eyes">
+                    <circle cx="88" cy="60" r="6.2" fill="#0f172a" />
+                    <circle cx="86.2" cy="58" r="2.2" fill="#ffffff" />
+                    <circle cx="112" cy="60" r="6.2" fill="#0f172a" />
+                    <circle cx="110.2" cy="58" r="2.2" fill="#ffffff" />
+                  </g>
+                </g>
+              </g>
+
+              <!-- Foreground Armored Bank Vault Door -->
+              <g class="fv-vault-door">
+                <!-- Outer Metallic Frame -->
+                <rect
+                  x="44"
+                  y="74"
+                  width="112"
+                  height="98"
+                  rx="16"
+                  fill="url(#fv-silver-grad)"
+                  stroke="#0f172a"
+                  stroke-width="2.5"
+                />
+                <!-- Inner Cobalt Door -->
+                <rect
+                  x="54"
+                  y="84"
+                  width="92"
+                  height="78"
+                  rx="10"
+                  fill="url(#fv-cobalt-grad)"
+                  stroke="#1e3a8a"
+                  stroke-width="2"
+                />
+
+                <!-- Vault Circular Ring -->
+                <circle
+                  cx="104"
+                  cy="123"
+                  r="33"
+                  fill="none"
+                  stroke="#cbd5e1"
+                  stroke-width="5.5"
+                />
+
+                <!-- Left Door Hinges & Locking Arm -->
+                <path
+                  d="M58 95 H78 L92 108 M58 151 H78 L92 138"
+                  stroke="#93c5fd"
+                  stroke-width="5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                />
+                <rect x="46" y="92" width="10" height="16" rx="3" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5" />
+                <rect x="46" y="138" width="10" height="16" rx="3" fill="#e2e8f0" stroke="#1e293b" stroke-width="1.5" />
+
+                <!-- Rotating Combination Dial & Spokes -->
+                <g class="fv-vault-dial">
+                  <line x1="104" y1="123" x2="104" y2="90" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" />
+                  <line x1="104" y1="123" x2="132" y2="140" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" />
+                  <line x1="104" y1="123" x2="76" y2="140" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" />
+                  <circle cx="104" cy="123" r="18" fill="#1e3a8a" stroke="#e2e8f0" stroke-width="3" />
+                  <circle cx="104" cy="123" r="12" fill="#38bdf8" opacity="0.85" />
+                  <circle cx="104" cy="123" r="7" fill="#e2e8f0" />
+                </g>
+              </g>
+            </g>
+          </svg>
+          <span class="hero-logo-hint">Click to replay unlock</span>
+        </button>
+
         <div class="hero-badge">
           <span class="badge-dot" aria-hidden="true"></span>
           <span>v0.1.0 Open Source (GPL-3.0) • Built with Rust &amp; Tauri v2</span>

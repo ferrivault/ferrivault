@@ -223,8 +223,133 @@ a {
    ========================================================================== */
 
 .hero {
-  padding: 4.5rem 0 3.5rem;
+  padding: 3.5rem 0 3.5rem;
   text-align: center;
+}
+
+/* ==========================================================================
+   Animated FerriVault Mascot + Vault Logo
+   ========================================================================== */
+
+.hero-logo-stage {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+  padding: 0;
+  color: var(--text-muted);
+}
+
+.hero-ferrivault-svg {
+  filter: drop-shadow(0 18px 36px rgba(23, 93, 220, 0.35));
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-logo-stage:hover .hero-ferrivault-svg {
+  transform: scale(1.05);
+}
+
+.hero-logo-hint {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.hero-logo-stage:hover .hero-logo-hint,
+.hero-logo-stage:focus-visible .hero-logo-hint {
+  opacity: 0.9;
+}
+
+.fv-vault-dial {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.fv-claw-left {
+  transform-box: fill-box;
+  transform-origin: 90% 85%;
+}
+
+.fv-claw-right {
+  transform-box: fill-box;
+  transform-origin: 10% 85%;
+}
+
+.fv-ferris-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fv-dial-spin {
+    0% { transform: rotate(0deg); }
+    35% { transform: rotate(380deg); }
+    45% { transform: rotate(360deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes fv-vault-nudge {
+    0%, 28% { transform: translateY(0); }
+    38% { transform: translateY(3px); }
+    48% { transform: translateY(0); }
+    100% { transform: translateY(0); }
+  }
+
+  @keyframes fv-ferris-emerge {
+    0%, 34% { transform: translateY(62px); }
+    64% { transform: translateY(-4px); }
+    78% { transform: translateY(2px); }
+    100% { transform: translateY(0); }
+  }
+
+  @keyframes fv-claw-left-wave {
+    0%, 45% { transform: rotate(-18deg); }
+    65% { transform: rotate(10deg); }
+    80% { transform: rotate(-6deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  @keyframes fv-claw-right-wave {
+    0%, 45% { transform: rotate(18deg); }
+    65% { transform: rotate(-10deg); }
+    80% { transform: rotate(6deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  @keyframes fv-eyes-blink {
+    0%, 46%, 50%, 92%, 96%, 100% { transform: scaleY(1); }
+    48%, 94% { transform: scaleY(0.12); }
+  }
+
+  .hero-logo-stage.is-playing .fv-vault-dial {
+    animation: fv-dial-spin 1.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  .hero-logo-stage.is-playing .fv-vault-door {
+    animation: fv-vault-nudge 1.9s ease-out forwards;
+  }
+
+  .hero-logo-stage.is-playing .fv-ferris-body {
+    animation: fv-ferris-emerge 1.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .hero-logo-stage.is-playing .fv-claw-left {
+    animation: fv-claw-left-wave 1.9s ease-out forwards;
+  }
+
+  .hero-logo-stage.is-playing .fv-claw-right {
+    animation: fv-claw-right-wave 1.9s ease-out forwards;
+  }
+
+  .hero-logo-stage.is-playing .fv-ferris-eyes {
+    animation: fv-eyes-blink 5.5s ease-in-out 2s infinite;
+  }
 }
 
 .hero-badge {

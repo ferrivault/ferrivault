@@ -95,6 +95,7 @@ const DICEWARE_WORDS = [
 
 document.addEventListener("DOMContentLoaded", () => {
   initToastSystem();
+  initHeroLogoReplay();
   initOsDownloadDetector();
   initMockVaultSimulator();
   initImageLightbox();
@@ -102,6 +103,16 @@ document.addEventListener("DOMContentLoaded", () => {
   initLivePasswordGenerator();
   initScrollAnimationFallbacks();
 });
+
+function initHeroLogoReplay() {
+  const stage = document.getElementById("hero-animated-logo");
+  if (!stage) return;
+  stage.addEventListener("click", () => {
+    stage.classList.remove("is-playing");
+    void stage.offsetWidth; // Force reflow to restart CSS keyframe sequence
+    stage.classList.add("is-playing");
+  });
+}
 
 /* ==========================================================================
    Toast Notification Helper
