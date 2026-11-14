@@ -20,6 +20,7 @@ function loadPersistedSettings(): AppSettings {
     clipboardClearSeconds: 30,
     autoLockMinutes: 15,
     closeToTray: true,
+    showFavicons: true,
   };
   try {
     const raw = localStorage.getItem(LOCAL_SETTINGS_KEY);
@@ -71,6 +72,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         partial.clipboardClearSeconds ?? current.clipboardClearSeconds,
       autoLockMinutes: partial.autoLockMinutes ?? current.autoLockMinutes,
       closeToTray: partial.closeToTray ?? current.closeToTray,
+      showFavicons: partial.showFavicons ?? current.showFavicons,
     };
 
     if (partial.locale && partial.locale !== current.locale) {

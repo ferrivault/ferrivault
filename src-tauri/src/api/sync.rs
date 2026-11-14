@@ -43,6 +43,18 @@ pub struct SyncProfile {
     pub organizations: Vec<SyncOrganization>,
 }
 
+/// Encrypted organization collection entry inside [`SyncResponse`].
+#[derive(Debug, Clone, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EncryptedCollection {
+    #[serde(alias = "Id")]
+    pub id: Option<String>,
+    #[serde(alias = "OrganizationId")]
+    pub organization_id: Option<String>,
+    #[serde(alias = "Name")]
+    pub name: Option<String>,
+}
+
 /// Top-level payload returned by `GET /api/sync`.
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -51,6 +63,8 @@ pub struct SyncResponse {
     pub profile: Option<SyncProfile>,
     #[serde(alias = "Folders", default)]
     pub folders: Vec<EncryptedFolder>,
+    #[serde(alias = "Collections", default)]
+    pub collections: Vec<EncryptedCollection>,
     #[serde(alias = "Ciphers", default)]
     pub ciphers: Vec<EncryptedCipher>,
 }

@@ -12,6 +12,7 @@ import {
   isCipherInVaultScope,
   type CipherTypeNumber,
   type CipherView,
+  type CollectionView,
   type FolderView,
   type OrganizationView,
   type VaultFilter,
@@ -29,6 +30,7 @@ interface VaultState {
   ciphers: CipherView[];
   folders: FolderView[];
   organizations: OrganizationView[];
+  collections: CollectionView[];
   vaultScope: VaultScope;
   filter: VaultFilter;
   searchQuery: string;
@@ -73,12 +75,14 @@ interface VaultState {
 export function createBlankCipher(
   cipherType: CipherTypeNumber = 1,
   folderId: string | null = null,
-  organizationId: string | null = null
+  organizationId: string | null = null,
+  collectionIds: string[] = []
 ): CipherView {
   return {
     id: "",
     organizationId,
     folderId,
+    collectionIds,
     type: cipherType,
     name: "",
     notes: "",
@@ -126,6 +130,7 @@ export function createBlankCipher(
           }
         : null,
     fields: [],
+    passwordHistory: [],
   };
 }
 
@@ -133,6 +138,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   ciphers: [],
   folders: [],
   organizations: [],
+  collections: [],
   vaultScope: { kind: "all" },
   filter: { kind: "all" },
   searchQuery: "",
@@ -156,6 +162,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       ciphers: snapshot.ciphers,
       folders: snapshot.folders,
       organizations: snapshot.organizations ?? [],
+      collections: snapshot.collections ?? [],
       lastSyncedAt: now,
       selectedCipherId:
         state.selectedCipherId &&
@@ -170,6 +177,7 @@ export const useVaultStore = create<VaultState>((set, get) => ({
       ciphers: [],
       folders: [],
       organizations: [],
+      collections: [],
       vaultScope: { kind: "all" },
       selectedCipherId: null,
       editingCipher: null,
@@ -189,6 +197,16 @@ export const useVaultStore = create<VaultState>((set, get) => ({
           (c) => !c.deletedDate && c.folderId === targetFolderId
         );
         if (!folderHasScopedItems && vaultScope.kind !== "all") {
+          nextFilter = { kind: "all" };
+        }
+      } else if (state.filter.kind === "collection") {
+        const targetColId = state.filter.collectionId;
+        const col = state.collections.find((c) => c.id === targetColId);
+        if (
+          vaultScope.kind === "myVault" ||
+          (vaultScope.kind === "organization" &&
+            col?.organizationId !== vaultScope.organizationId)
+        ) {
           nextFilter = { kind: "all" };
         }
       }
@@ -231,20 +249,39 @@ export const useVaultStore = create<VaultState>((set, get) => ({
   startCreateCipher: (defaultType) => {
     const currentFilter = get().filter;
     const currentScope = get().vaultScope;
+    const collections = get().collections;
     const inferredType: CipherTypeNumber =
       defaultType ??
       (currentFilter.kind === "type" ? currentFilter.cipherType : 1);
     const inferredFolder =
       currentFilter.kind === "folder" ? currentFilter.folderId : null;
-    const inferredOrg =
+
+    let inferredOrg =
       currentScope.kind === "organization" ? currentScope.organizationId : null;
+    let inferredCollections: string[] = [];
+
+    if (currentFilter.kind === "collection") {
+      const col = collections.find((c) => c.id === currentFilter.collectionId);
+      if (col) {
+        inferredOrg = col.organizationId;
+        inferredCollections = [col.id];
+      }
+    } else if (inferredOrg) {
+      const firstOrgCol = collections.find(
+        (c) => c.organizationId === inferredOrg
+      );
+      if (firstOrgCol) {
+        inferredCollections = [firstOrgCol.id];
+      }
+    }
 
     set({
       isCreatingCipher: true,
       editingCipher: createBlankCipher(
         inferredType,
         inferredFolder,
-        inferredOrg
+        inferredOrg,
+        inferredCollections
       ),
     });
   },

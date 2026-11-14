@@ -23,6 +23,7 @@ export const SettingsModal: React.FC = () => {
   );
   const autoLockMinutes = useSettingsStore((s) => s.autoLockMinutes);
   const closeToTray = useSettingsStore((s) => s.closeToTray);
+  const showFavicons = useSettingsStore((s) => s.showFavicons);
   const updateSettings = useSettingsStore((s) => s.updateSettings);
 
   if (!isOpen) return null;
@@ -129,6 +130,25 @@ export const SettingsModal: React.FC = () => {
                   <option value={60}>{t("settings.autoLock1h")}</option>
                 </select>
               </div>
+
+              <label className="flex items-start gap-2.5 pt-1 text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={showFavicons}
+                  onChange={(e) =>
+                    void updateSettings({ showFavicons: e.target.checked })
+                  }
+                  className="mt-0.5 rounded border-slate-700 bg-slate-900 text-brand-600"
+                />
+                <div>
+                  <span className="block font-medium text-slate-200">
+                    {t("settings.showFaviconsLabel")}
+                  </span>
+                  <span className="mt-0.5 block text-[11px] text-slate-500">
+                    {t("settings.showFaviconsDesc")}
+                  </span>
+                </div>
+              </label>
             </div>
           </div>
 

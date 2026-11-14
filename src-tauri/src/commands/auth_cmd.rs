@@ -11,12 +11,14 @@ use crate::api::{
     sync::{fetch_sync, SyncResponse},
 };
 use crate::crypto::{
-    enc_string::{decrypt_rsa_enc_string, EncString},
+    enc_string::{decrypt_optional, decrypt_rsa_enc_string, EncString},
     kdf::{derive_master_key, derive_master_password_hash, stretch_master_key, KdfParams},
     keys::SymmetricCryptoKey,
 };
 use crate::error::AppError;
-use crate::state::{AppState, AuthStatus, OrganizationView, SessionData, VaultSnapshot};
+use crate::state::{
+    AppState, AuthStatus, CollectionView, OrganizationView, SessionData, VaultSnapshot,
+};
 
 /// Login request payload sent from the React login view.
 #[derive(Debug, Deserialize)]
@@ -118,6 +120,29 @@ pub fn decrypt_sync_response(
     }
     organizations.sort_by_key(|a| a.name.to_lowercase());
 
+    let mut collections = Vec::new();
+    for enc_col in &sync_resp.collections {
+        let Some(col_id) = enc_col.id.as_deref().filter(|s| !s.is_empty()) else {
+            continue;
+        };
+        let Some(org_id) = enc_col.organization_id.as_deref().filter(|s| !s.is_empty()) else {
+            continue;
+        };
+        let Some(org_key) = org_keys.get(org_id) else {
+            continue;
+        };
+        if let Ok(Some(col_name)) = decrypt_optional(enc_col.name.as_deref(), org_key) {
+            if !col_name.trim().is_empty() {
+                collections.push(CollectionView {
+                    id: col_id.to_string(),
+                    organization_id: org_id.to_string(),
+                    name: col_name,
+                });
+            }
+        }
+    }
+    collections.sort_by_key(|a| a.name.to_lowercase());
+
     let mut ciphers = Vec::new();
     for enc_cipher in &sync_resp.ciphers {
         if let Ok(cipher) = enc_cipher.decrypt_with_org_keys(vault_key, &org_keys) {
@@ -132,6 +157,7 @@ pub fn decrypt_sync_response(
         ciphers,
         folders,
         organizations,
+        collections,
     }
 }
 

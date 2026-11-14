@@ -42,6 +42,7 @@ export const Sidebar: React.FC = () => {
   const ciphers = useVaultStore((s) => s.ciphers);
   const folders = useVaultStore((s) => s.folders);
   const organizations = useVaultStore((s) => s.organizations);
+  const collections = useVaultStore((s) => s.collections);
   const vaultScope = useVaultStore((s) => s.vaultScope);
   const setVaultScope = useVaultStore((s) => s.setVaultScope);
   const filter = useVaultStore((s) => s.filter);
@@ -86,6 +87,14 @@ export const Sidebar: React.FC = () => {
     return false;
   });
 
+  const visibleCollections = collections.filter((col) => {
+    if (vaultScope.kind === "all") return true;
+    if (vaultScope.kind === "organization") {
+      return col.organizationId === vaultScope.organizationId;
+    }
+    return false;
+  });
+
   const isScopeSelected = (candidate: VaultScope): boolean => {
     if (vaultScope.kind !== candidate.kind) return false;
     if (
@@ -104,6 +113,9 @@ export const Sidebar: React.FC = () => {
     }
     if (filter.kind === "folder" && candidate.kind === "folder") {
       return filter.folderId === candidate.folderId;
+    }
+    if (filter.kind === "collection" && candidate.kind === "collection") {
+      return filter.collectionId === candidate.collectionId;
     }
     return true;
   };
@@ -390,6 +402,45 @@ export const Sidebar: React.FC = () => {
             })}
           </div>
         </div>
+
+        {/* Organization Collections */}
+        {visibleCollections.length > 0 && (
+          <div>
+            <div className="mb-1.5 px-2.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">
+              {t("sidebar.collectionsHeader")}
+            </div>
+            <div className="space-y-1">
+              {visibleCollections.map((col) => {
+                const count = activeCiphers.filter((c) =>
+                  c.collectionIds.includes(col.id)
+                ).length;
+                return (
+                  <button
+                    key={col.id}
+                    type="button"
+                    onClick={() =>
+                      setFilter({ kind: "collection", collectionId: col.id })
+                    }
+                    className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 font-medium transition ${
+                      isSelected({ kind: "collection", collectionId: col.id })
+                        ? "bg-brand-600/20 text-brand-300"
+                        : "text-slate-300 hover:bg-slate-800/60"
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5 truncate">
+                      <Building2Icon
+                        size={15}
+                        className="shrink-0 text-amber-400"
+                      />
+                      <span className="truncate">{col.name}</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500">{count}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Folders */}
         <div>

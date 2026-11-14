@@ -1,18 +1,15 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  CreditCardIcon,
-  FileTextIcon,
-  GlobeIcon,
   PlusIcon,
   SearchIcon,
   StarIcon,
-  UserCheckIcon,
   XIcon,
 } from "@animateicons/react/lucide";
 import { extractHostname } from "../../lib/utils";
 import { useVaultStore } from "../../stores/vaultStore";
 import { isCipherInVaultScope, type CipherView } from "../../types/vault";
+import { CipherIcon } from "./CipherIcon";
 
 export const CipherList: React.FC = () => {
   const { t } = useTranslation();
@@ -44,6 +41,9 @@ export const CipherList: React.FC = () => {
         if (filter.kind === "folder") {
           const cid = cipher.folderId ?? null;
           if (cid !== filter.folderId) return false;
+        }
+        if (filter.kind === "collection") {
+          if (!cipher.collectionIds.includes(filter.collectionId)) return false;
         }
       }
 
@@ -83,21 +83,6 @@ export const CipherList: React.FC = () => {
     return cipher.notes?.slice(0, 48) ?? "";
   };
 
-  const renderIcon = (type: number) => {
-    switch (type) {
-      case 1:
-        return <GlobeIcon size={16} className="text-brand-400" />;
-      case 2:
-        return <FileTextIcon size={16} className="text-emerald-400" />;
-      case 3:
-        return <CreditCardIcon size={16} className="text-purple-400" />;
-      case 4:
-        return <UserCheckIcon size={16} className="text-amber-400" />;
-      default:
-        return <GlobeIcon size={16} className="text-slate-400" />;
-    }
-  };
-
   return (
     <section className="flex h-full w-80 shrink-0 flex-col border-r border-slate-800/80 bg-slate-950/60">
       {/* Search & New Button Header */}
@@ -107,6 +92,7 @@ export const CipherList: React.FC = () => {
             <SearchIcon size={14} />
           </div>
           <input
+            id="vault-search-input"
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -165,7 +151,7 @@ export const CipherList: React.FC = () => {
                 }`}
               >
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-800 bg-slate-900">
-                  {renderIcon(cipher.type)}
+                  <CipherIcon cipher={cipher} size={18} />
                 </div>
 
                 <div className="min-w-0 flex-1">

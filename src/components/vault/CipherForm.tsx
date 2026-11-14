@@ -25,6 +25,8 @@ export const CipherForm: React.FC = () => {
   const editingCipher = useVaultStore((s) => s.editingCipher);
   const isCreating = useVaultStore((s) => s.isCreatingCipher);
   const folders = useVaultStore((s) => s.folders);
+  const organizations = useVaultStore((s) => s.organizations);
+  const collections = useVaultStore((s) => s.collections);
   const saveCipher = useVaultStore((s) => s.saveCipher);
   const cancelEditCipher = useVaultStore((s) => s.cancelEditCipher);
   const openGenerator = useVaultStore((s) => s.openGenerator);
@@ -37,8 +39,17 @@ export const CipherForm: React.FC = () => {
   const [showCvv, setShowCvv] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const orgCollections = collections.filter(
+    (c) => c.organizationId === form.organizationId
+  );
+
   const handleTypeChange = (newType: CipherTypeNumber) => {
-    const template = createBlankCipher(newType, form.folderId);
+    const template = createBlankCipher(
+      newType,
+      form.folderId,
+      form.organizationId,
+      form.collectionIds
+    );
     setForm({
       ...template,
       id: form.id,
@@ -46,6 +57,30 @@ export const CipherForm: React.FC = () => {
       notes: form.notes,
       favorite: form.favorite,
       fields: form.fields,
+      passwordHistory: form.passwordHistory,
+    });
+  };
+
+  const handleOrganizationChange = (nextOrgId: string | null) => {
+    const firstCol = nextOrgId
+      ? collections.find((c) => c.organizationId === nextOrgId)
+      : undefined;
+    setForm((prev) => ({
+      ...prev,
+      organizationId: nextOrgId,
+      collectionIds: firstCol ? [firstCol.id] : [],
+    }));
+  };
+
+  const toggleCollection = (collectionId: string) => {
+    setForm((prev) => {
+      const exists = prev.collectionIds.includes(collectionId);
+      return {
+        ...prev,
+        collectionIds: exists
+          ? prev.collectionIds.filter((id) => id !== collectionId)
+          : [...prev.collectionIds, collectionId],
+      };
     });
   };
 
@@ -177,6 +212,53 @@ export const CipherForm: React.FC = () => {
             </select>
           </div>
         </div>
+
+        {/* Organization & Collection Assignment */}
+        {isCreating && organizations.length > 0 && (
+          <div>
+            <label className="mb-1 block font-medium text-slate-300">
+              {t("vault.ownerLabel")}
+            </label>
+            <select
+              value={form.organizationId ?? ""}
+              onChange={(e) =>
+                handleOrganizationChange(e.target.value || null)
+              }
+              className="w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-slate-100 focus:border-brand-500 focus:outline-none"
+            >
+              <option value="">{t("sidebar.myVault")}</option>
+              {organizations.map((org) => (
+                <option key={org.id} value={org.id}>
+                  {org.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        {form.organizationId && orgCollections.length > 0 && (
+          <div className="rounded-xl border border-slate-800 bg-slate-900/50 p-3.5">
+            <label className="mb-2 block font-semibold uppercase tracking-wider text-slate-400">
+              {t("sidebar.collectionsHeader")}
+            </label>
+            <div className="grid grid-cols-2 gap-2">
+              {orgCollections.map((col) => (
+                <label
+                  key={col.id}
+                  className="flex cursor-pointer items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/60 px-2.5 py-1.5 text-slate-200 hover:border-slate-700"
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.collectionIds.includes(col.id)}
+                    onChange={() => toggleCollection(col.id)}
+                    className="rounded border-slate-700 bg-slate-900 text-brand-600"
+                  />
+                  <span className="truncate">{col.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex items-end gap-4">
           <div className="flex-1">

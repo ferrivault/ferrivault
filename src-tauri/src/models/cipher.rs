@@ -123,6 +123,16 @@ pub struct EncryptedCustomField {
     pub r#type: u8,
 }
 
+/// Encrypted password history entry.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EncryptedPasswordHistoryEntry {
+    #[serde(alias = "Password")]
+    pub password: Option<String>,
+    #[serde(alias = "LastUsedDate")]
+    pub last_used_date: Option<String>,
+}
+
 /// Encrypted cipher payload returned by `/api/sync` or `/api/ciphers`.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -133,6 +143,8 @@ pub struct EncryptedCipher {
     pub organization_id: Option<String>,
     #[serde(alias = "FolderId")]
     pub folder_id: Option<String>,
+    #[serde(alias = "CollectionIds", default)]
+    pub collection_ids: Option<Vec<String>>,
     #[serde(alias = "Type", default)]
     pub r#type: u8,
     #[serde(alias = "Name")]
@@ -151,6 +163,8 @@ pub struct EncryptedCipher {
     pub identity: Option<EncryptedIdentity>,
     #[serde(alias = "Fields", default)]
     pub fields: Option<Vec<EncryptedCustomField>>,
+    #[serde(alias = "PasswordHistory", default)]
+    pub password_history: Option<Vec<EncryptedPasswordHistoryEntry>>,
     #[serde(alias = "RevisionDate")]
     pub revision_date: Option<String>,
     #[serde(alias = "CreationDate")]
@@ -229,6 +243,14 @@ pub struct CustomFieldView {
     pub r#type: u8,
 }
 
+/// Decrypted password history entry.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PasswordHistoryView {
+    pub password: String,
+    pub last_used_date: String,
+}
+
 /// Decrypted cipher DTO sent to and received from the frontend.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -236,6 +258,8 @@ pub struct CipherView {
     pub id: String,
     pub organization_id: Option<String>,
     pub folder_id: Option<String>,
+    #[serde(default)]
+    pub collection_ids: Vec<String>,
     /// `1` = Login, `2` = Secure Note, `3` = Card, `4` = Identity
     pub r#type: u8,
     pub name: String,
@@ -244,7 +268,10 @@ pub struct CipherView {
     pub login: Option<LoginView>,
     pub card: Option<CardView>,
     pub identity: Option<IdentityView>,
+    #[serde(default)]
     pub fields: Vec<CustomFieldView>,
+    #[serde(default)]
+    pub password_history: Vec<PasswordHistoryView>,
     pub revision_date: Option<String>,
     pub creation_date: Option<String>,
     pub deleted_date: Option<String>,
@@ -365,10 +392,23 @@ impl EncryptedCipher {
             }
         }
 
+        let mut password_history = Vec::new();
+        if let Some(enc_history) = &self.password_history {
+            for entry in enc_history {
+                if let Ok(Some(pw)) = decrypt_optional(entry.password.as_deref(), key) {
+                    password_history.push(PasswordHistoryView {
+                        password: pw,
+                        last_used_date: entry.last_used_date.clone().unwrap_or_default(),
+                    });
+                }
+            }
+        }
+
         Ok(CipherView {
             id,
             organization_id: self.organization_id.clone(),
             folder_id: self.folder_id.clone(),
+            collection_ids: self.collection_ids.clone().unwrap_or_default(),
             r#type: self.r#type,
             name,
             notes,
@@ -377,6 +417,7 @@ impl EncryptedCipher {
             card,
             identity,
             fields,
+            password_history,
             revision_date: self.revision_date.clone(),
             creation_date: self.creation_date.clone(),
             deleted_date: self.deleted_date.clone(),
@@ -468,6 +509,16 @@ impl CipherView {
             }
         }
 
+        let mut enc_history = Vec::new();
+        for entry in &self.password_history {
+            if !entry.password.is_empty() {
+                enc_history.push(EncryptedPasswordHistoryEntry {
+                    password: Some(EncString::encrypt_utf8(&entry.password, key)?),
+                    last_used_date: Some(entry.last_used_date.clone()),
+                });
+            }
+        }
+
         Ok(EncryptedCipher {
             id: if self.id.is_empty() {
                 None
@@ -476,6 +527,11 @@ impl CipherView {
             },
             organization_id: self.organization_id.clone(),
             folder_id: self.folder_id.clone().filter(|s| !s.is_empty()),
+            collection_ids: if self.collection_ids.is_empty() {
+                None
+            } else {
+                Some(self.collection_ids.clone())
+            },
             r#type: self.r#type,
             name: Some(encrypted_name),
             notes: encrypted_notes,
@@ -488,6 +544,11 @@ impl CipherView {
                 None
             } else {
                 Some(enc_fields)
+            },
+            password_history: if enc_history.is_empty() {
+                None
+            } else {
+                Some(enc_history)
             },
             revision_date: self.revision_date.clone(),
             creation_date: self.creation_date.clone(),

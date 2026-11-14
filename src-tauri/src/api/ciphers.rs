@@ -1,6 +1,7 @@
 //! CRUD operations for Bitwarden/Vaultwarden Ciphers (`/api/ciphers`) and Folders (`/api/folders`).
 
 use reqwest::Client;
+use serde::Serialize;
 
 use crate::api::endpoints::ServerEndpoints;
 use crate::error::AppError;
@@ -9,20 +10,48 @@ use crate::models::{
     folder::{EncryptedFolder, FolderRequest},
 };
 
-/// Creates a new encrypted cipher via `POST /api/ciphers`.
+#[derive(Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CreateOrganizationCipherRequest<'a> {
+    cipher: &'a EncryptedCipher,
+    collection_ids: &'a [String],
+}
+
+/// Creates a new encrypted cipher via `POST /api/ciphers` (or `POST /api/ciphers/create` when
+/// assigning the cipher to organization collections).
 pub async fn create_cipher_remote(
     client: &Client,
     endpoints: &ServerEndpoints,
     access_token: &str,
     cipher: &EncryptedCipher,
 ) -> Result<EncryptedCipher, AppError> {
-    let url = format!("{}/ciphers", endpoints.api_url);
-    let response = client
-        .post(&url)
-        .bearer_auth(access_token)
-        .json(cipher)
-        .send()
-        .await?;
+    let has_org = cipher
+        .organization_id
+        .as_deref()
+        .is_some_and(|s| !s.is_empty());
+    let col_ids = cipher.collection_ids.as_deref().unwrap_or(&[]);
+
+    let response = if has_org && !col_ids.is_empty() {
+        let url = format!("{}/ciphers/create", endpoints.api_url);
+        let body = CreateOrganizationCipherRequest {
+            cipher,
+            collection_ids: col_ids,
+        };
+        client
+            .post(&url)
+            .bearer_auth(access_token)
+            .json(&body)
+            .send()
+            .await?
+    } else {
+        let url = format!("{}/ciphers", endpoints.api_url);
+        client
+            .post(&url)
+            .bearer_auth(access_token)
+            .json(cipher)
+            .send()
+            .await?
+    };
 
     if !response.status().is_success() {
         let status = response.status();

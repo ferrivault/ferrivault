@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Building2Icon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  ClockIcon,
   CopyIcon,
   ExternalLinkIcon,
   EyeIcon,
@@ -19,6 +22,7 @@ import { formatCardNumber, parseBackendError } from "../../lib/utils";
 import { useVaultStore } from "../../stores/vaultStore";
 import { TotpBadge } from "../tools/TotpBadge";
 import { ConfirmDialog } from "../ui/ConfirmDialog";
+import { CipherIcon } from "./CipherIcon";
 
 interface DetailFieldProps {
   label: string;
@@ -113,6 +117,7 @@ export const CipherDetail: React.FC = () => {
   const ciphers = useVaultStore((s) => s.ciphers);
   const folders = useVaultStore((s) => s.folders);
   const organizations = useVaultStore((s) => s.organizations);
+  const collections = useVaultStore((s) => s.collections);
   const selectedCipherId = useVaultStore((s) => s.selectedCipherId);
   const startEditCipher = useVaultStore((s) => s.startEditCipher);
   const softDeleteCipher = useVaultStore((s) => s.softDeleteCipher);
@@ -121,6 +126,7 @@ export const CipherDetail: React.FC = () => {
   const pushToast = useVaultStore((s) => s.pushToast);
 
   const [revealCardNumber, setRevealCardNumber] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [confirmingSoftDelete, setConfirmingSoftDelete] = useState(false);
   const [confirmingPermDelete, setConfirmingPermDelete] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -150,6 +156,9 @@ export const CipherDetail: React.FC = () => {
     ? (organizations.find((o) => o.id === cipher.organizationId)?.name ??
       cipher.organizationId)
     : null;
+  const itemCollections = collections.filter((col) =>
+    cipher.collectionIds.includes(col.id)
+  );
   const isTrashed = Boolean(cipher.deletedDate);
 
   const handleSoftDelete = async () => {
@@ -201,32 +210,52 @@ export const CipherDetail: React.FC = () => {
 
       {/* Top Header */}
       <div className="flex items-start justify-between border-b border-slate-800 pb-5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-white">{cipher.name}</h2>
-            {cipher.favorite && (
-              <StarIcon size={16} className="text-amber-400" />
-            )}
+        <div className="flex items-start gap-3.5">
+          <div className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-slate-800 bg-slate-900">
+            <CipherIcon cipher={cipher} size={22} />
           </div>
-          <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-400">
-            <span className="flex items-center gap-1.5">
-              {orgName ? (
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-bold text-white">{cipher.name}</h2>
+              {cipher.favorite && (
+                <StarIcon size={16} className="text-amber-400" />
+              )}
+            </div>
+            <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+              <span className="flex items-center gap-1.5">
+                {orgName ? (
+                  <>
+                    <Building2Icon size={14} className="text-amber-400" />
+                    <span className="text-amber-300">{orgName}</span>
+                  </>
+                ) : (
+                  <>
+                    <UserIcon size={14} className="text-emerald-400" />
+                    <span>{t("sidebar.myVault")}</span>
+                  </>
+                )}
+              </span>
+              <span className="text-slate-700">•</span>
+              <span className="flex items-center gap-1.5">
+                <FolderIcon size={14} />
+                <span>{folderName}</span>
+              </span>
+              {itemCollections.length > 0 && (
                 <>
-                  <Building2Icon size={14} className="text-amber-400" />
-                  <span className="text-amber-300">{orgName}</span>
-                </>
-              ) : (
-                <>
-                  <UserIcon size={14} className="text-emerald-400" />
-                  <span>{t("sidebar.myVault")}</span>
+                  <span className="text-slate-700">•</span>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {itemCollections.map((col) => (
+                      <span
+                        key={col.id}
+                        className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-300"
+                      >
+                        {col.name}
+                      </span>
+                    ))}
+                  </div>
                 </>
               )}
-            </span>
-            <span className="text-slate-700">•</span>
-            <span className="flex items-center gap-1.5">
-              <FolderIcon size={14} />
-              <span>{folderName}</span>
-            </span>
+            </div>
           </div>
         </div>
 
@@ -490,6 +519,47 @@ export const CipherDetail: React.FC = () => {
                 secret={f.type === 1}
               />
             ))}
+          </div>
+        )}
+
+        {/* Password History */}
+        {cipher.passwordHistory && cipher.passwordHistory.length > 0 && (
+          <div className="space-y-2.5">
+            <button
+              type="button"
+              onClick={() => setIsHistoryOpen((v) => !v)}
+              className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 transition hover:text-slate-200"
+            >
+              {isHistoryOpen ? (
+                <ChevronDownIcon size={14} />
+              ) : (
+                <ChevronRightIcon size={14} />
+              )}
+              <ClockIcon size={14} className="text-brand-400" />
+              <span>
+                {t("vault.passwordHistory.title", {
+                  count: cipher.passwordHistory.length,
+                })}
+              </span>
+            </button>
+
+            {isHistoryOpen && (
+              <div className="space-y-2">
+                {cipher.passwordHistory.map((entry, idx) => (
+                  <DetailField
+                    key={idx}
+                    label={
+                      entry.lastUsedDate
+                        ? new Date(entry.lastUsedDate).toLocaleString()
+                        : `#${idx + 1}`
+                    }
+                    value={entry.password}
+                    secret
+                    monospace
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
 

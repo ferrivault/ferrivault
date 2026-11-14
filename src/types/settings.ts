@@ -3,6 +3,7 @@ export interface AppSettings {
   clipboardClearSeconds: number;
   autoLockMinutes: number;
   closeToTray: boolean;
+  showFavicons: boolean;
 }
 
 export interface TrayMenuLabels {

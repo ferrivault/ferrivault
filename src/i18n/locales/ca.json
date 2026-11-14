@@ -77,6 +77,7 @@
     "typeNote": "Notes segures",
     "typeCard": "Targetes",
     "typeIdentity": "Identitats",
+    "collectionsHeader": "Col·leccions",
     "foldersHeader": "Carpetes",
     "noFolder": "Sense carpeta",
     "addFolder": "Carpeta nova",
@@ -103,6 +104,7 @@
     "itemType": "Tipus d'element",
     "itemName": "Nom de l'element",
     "itemNamePlaceholder": "p. ex., GitHub, Correu personal, Targeta bancària",
+    "ownerLabel": "Propietari (Caixa forta)",
     "folder": "Carpeta",
     "favorite": "Preferit",
     "markFavorite": "Marca com a preferit",
@@ -127,6 +129,9 @@
     "timestamps": {
       "updated": "Darrera actualització: {{date}}",
       "created": "Creat: {{date}}"
+    },
+    "passwordHistory": {
+      "title": "Historial de contrasenyes ({{count}})"
     },
     "login": {
       "sectionTitle": "Credencials d'accés",
@@ -215,6 +220,8 @@
     "autoLock15m": "15 minuts",
     "autoLock30m": "30 minuts",
     "autoLock1h": "1 hora",
+    "showFaviconsLabel": "Mostra les icones dels llocs web (favicons)",
+    "showFaviconsDesc": "Carrega les icones de domini des del servei d'icones de Bitwarden/Vaultwarden als inicis de sessió.",
     "traySection": "Integració amb la safata del sistema",
     "closeToTrayLabel": "Minimitza a la safata del sistema en tancar la finestra",
     "closeToTrayDesc": "Manté el Rustwarden actiu a la barra del sistema en prémer el botó de tancar.",
@@ -239,7 +246,8 @@
     "itemPermanentlyDeleted": "Element suprimit permanentment",
     "folderSaved": "Carpeta desada",
     "folderDeleted": "Carpeta suprimida",
-    "vaultLocked": "Caixa forta bloquejada i claus esborrades de la memòria"
+    "vaultLocked": "Caixa forta bloquejada i claus esborrades de la memòria",
+    "vaultAutoLocked": "Caixa forta bloquejada automàticament per inactivitat"
   },
   "errors": {
     "invalidCredentials": "El correu, la contrasenya mestra o el codi són incorrectes ({{message}}).",

@@ -77,6 +77,7 @@
     "typeNote": "Notas seguras",
     "typeCard": "Tarjetas",
     "typeIdentity": "Identidades",
+    "collectionsHeader": "Colecciones",
     "foldersHeader": "Carpetas",
     "noFolder": "Sin carpeta",
     "addFolder": "Nueva carpeta",
@@ -103,6 +104,7 @@
     "itemType": "Tipo de elemento",
     "itemName": "Nombre del elemento",
     "itemNamePlaceholder": "p. ej., GitHub, Correo personal, Tarjeta bancaria",
+    "ownerLabel": "Propietario (Bóveda)",
     "folder": "Carpeta",
     "favorite": "Favorito",
     "markFavorite": "Marcar como favorito",
@@ -127,6 +129,9 @@
     "timestamps": {
       "updated": "Última actualización: {{date}}",
       "created": "Creado: {{date}}"
+    },
+    "passwordHistory": {
+      "title": "Historial de contraseñas ({{count}})"
     },
     "login": {
       "sectionTitle": "Credenciales de acceso",
@@ -215,6 +220,8 @@
     "autoLock15m": "15 minutos",
     "autoLock30m": "30 minutos",
     "autoLock1h": "1 hora",
+    "showFaviconsLabel": "Mostrar iconos de sitios web (favicons)",
+    "showFaviconsDesc": "Carga los iconos de dominio desde el servicio de iconos de Bitwarden/Vaultwarden en los inicios de sesión.",
     "traySection": "Integración con la bandeja del sistema",
     "closeToTrayLabel": "Minimizar a la bandeja del sistema al cerrar la ventana",
     "closeToTrayDesc": "Mantiene Rustwarden activo en la barra del sistema al pulsar el botón de cerrar.",
@@ -239,7 +246,8 @@
     "itemPermanentlyDeleted": "Elemento eliminado permanentemente",
     "folderSaved": "Carpeta guardada",
     "folderDeleted": "Carpeta eliminada",
-    "vaultLocked": "Bóveda bloqueada y claves borradas de la memoria"
+    "vaultLocked": "Bóveda bloqueada y claves borradas de la memoria",
+    "vaultAutoLocked": "Bóveda bloqueada automáticamente por inactividad"
   },
   "errors": {
     "invalidCredentials": "Correo, contraseña maestra o código incorrectos ({{message}}).",

@@ -13,7 +13,7 @@ use crate::api::{
 use crate::commands::auth_cmd::{decrypt_organization_keys, decrypt_sync_response};
 use crate::error::AppError;
 use crate::models::{
-    cipher::CipherView,
+    cipher::{CipherView, PasswordHistoryView},
     folder::{FolderRequest, FolderView},
 };
 use crate::state::{AppState, VaultSnapshot};
@@ -60,14 +60,14 @@ pub async fn sync_vault(state: State<'_, AppState>) -> Result<VaultSnapshot, App
 /// decrypted updated `CipherView` and refreshing the in-memory vault cache.
 #[tauri::command]
 pub async fn save_cipher(
-    cipher: CipherView,
+    mut cipher: CipherView,
     state: State<'_, AppState>,
 ) -> Result<CipherView, AppError> {
     if cipher.name.trim().is_empty() {
         return Err(AppError::Validation("Item name is required".into()));
     }
 
-    let (endpoints, access_token, vault_key, org_keys) = {
+    let (endpoints, access_token, vault_key, org_keys, previous_password) = {
         let session_guard = state.session.read().await;
         let session = session_guard.as_ref().ok_or(AppError::VaultLocked)?;
         let key = session.vault_key.clone().ok_or(AppError::VaultLocked)?;
@@ -76,13 +76,45 @@ pub async fn save_cipher(
             .as_ref()
             .map(|s| decrypt_organization_keys(s, &key))
             .unwrap_or_default();
+        let prev_pw = if !cipher.id.trim().is_empty() {
+            session
+                .decrypted_snapshot
+                .as_ref()
+                .and_then(|snap| snap.ciphers.iter().find(|c| c.id == cipher.id))
+                .and_then(|existing| existing.login.as_ref())
+                .and_then(|l| l.password.clone())
+                .filter(|pw| !pw.is_empty())
+        } else {
+            None
+        };
         (
             session.endpoints.clone(),
             session.access_token.clone(),
             key,
             orgs,
+            prev_pw,
         )
     };
+
+    if cipher.r#type == 1 {
+        if let Some(old_pw) = previous_password {
+            let new_pw = cipher
+                .login
+                .as_ref()
+                .and_then(|l| l.password.as_deref())
+                .unwrap_or("");
+            if old_pw != new_pw {
+                cipher.password_history.insert(
+                    0,
+                    PasswordHistoryView {
+                        password: old_pw,
+                        last_used_date: chrono::Utc::now().to_rfc3339(),
+                    },
+                );
+                cipher.password_history.truncate(5);
+            }
+        }
+    }
 
     let target_key = match cipher.organization_id.as_deref().filter(|s| !s.is_empty()) {
         Some(org_id) => org_keys.get(org_id).unwrap_or(&vault_key),

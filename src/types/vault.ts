@@ -55,10 +55,16 @@ export interface CustomFieldView {
   type: number;
 }
 
+export interface PasswordHistoryView {
+  password: string;
+  lastUsedDate: string;
+}
+
 export interface CipherView {
   id: string;
   organizationId?: string | null;
   folderId?: string | null;
+  collectionIds: string[];
   type: CipherTypeNumber;
   name: string;
   notes?: string | null;
@@ -67,6 +73,7 @@ export interface CipherView {
   card?: CardView | null;
   identity?: IdentityView | null;
   fields: CustomFieldView[];
+  passwordHistory: PasswordHistoryView[];
   revisionDate?: string | null;
   creationDate?: string | null;
   deletedDate?: string | null;
@@ -83,12 +90,19 @@ export interface OrganizationView {
   name: string;
 }
 
+export interface CollectionView {
+  id: string;
+  organizationId: string;
+  name: string;
+}
+
 export interface VaultSnapshot {
   email: string;
   serverUrl: string;
   ciphers: CipherView[];
   folders: FolderView[];
   organizations: OrganizationView[];
+  collections: CollectionView[];
 }
 
 export type VaultScope =
@@ -134,4 +148,5 @@ export type VaultFilter =
   | { kind: "favorites" }
   | { kind: "trash" }
   | { kind: "type"; cipherType: CipherTypeNumber }
-  | { kind: "folder"; folderId: string | null };
+  | { kind: "folder"; folderId: string | null }
+  | { kind: "collection"; collectionId: string };

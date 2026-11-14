@@ -61,6 +61,32 @@ export function extractHostname(rawUri?: string | null): string | null {
 }
 
 /**
+ * Resolves the Bitwarden/Vaultwarden icon service URL for a given login URI and server base URL.
+ */
+export function getFaviconUrl(
+  rawUri?: string | null,
+  serverUrl?: string | null
+): string | null {
+  const hostname = extractHostname(rawUri)?.toLowerCase().trim();
+  if (!hostname || !hostname.includes(".") || hostname === "localhost") {
+    return null;
+  }
+  // Skip IPv4 literals
+  if (/^\d{1,3}(\.\d{1,3}){3}$/.test(hostname)) {
+    return null;
+  }
+
+  const base = (serverUrl ?? "").toLowerCase().replace(/\/+$/, "");
+  if (!base || base.includes("bitwarden.com")) {
+    return `https://icons.bitwarden.net/${encodeURIComponent(hostname)}/icon.png`;
+  }
+  if (base.includes("bitwarden.eu")) {
+    return `https://icons.bitwarden.eu/${encodeURIComponent(hostname)}/icon.png`;
+  }
+  return `${(serverUrl ?? "").replace(/\/+$/, "")}/icons/${encodeURIComponent(hostname)}/icon.png`;
+}
+
+/**
  * Formats a credit card number with spaces every 4 digits, or masks all but the last 4 digits.
  */
 export function formatCardNumber(

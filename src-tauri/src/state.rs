@@ -13,6 +13,10 @@ use crate::api::{endpoints::ServerEndpoints, sync::SyncResponse};
 use crate::crypto::{kdf::KdfParams, keys::SymmetricCryptoKey};
 use crate::models::{cipher::CipherView, folder::FolderView};
 
+fn default_true() -> bool {
+    true
+}
+
 /// User preferences managed in backend state.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -25,6 +29,9 @@ pub struct AppSettings {
     pub auto_lock_minutes: u64,
     /// Whether closing the main window minimizes Rustwarden to the system tray instead of quitting.
     pub close_to_tray: bool,
+    /// Whether to display website favicons for Login items in the vault list and detail view.
+    #[serde(default = "default_true")]
+    pub show_favicons: bool,
 }
 
 impl Default for AppSettings {
@@ -34,6 +41,7 @@ impl Default for AppSettings {
             clipboard_clear_seconds: 30,
             auto_lock_minutes: 15,
             close_to_tray: true,
+            show_favicons: true,
         }
     }
 }
@@ -46,6 +54,15 @@ pub struct OrganizationView {
     pub name: String,
 }
 
+/// Decrypted organization collection DTO exposed to the React frontend.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CollectionView {
+    pub id: String,
+    pub organization_id: String,
+    pub name: String,
+}
+
 /// Complete decrypted vault snapshot sent to the React frontend.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -55,6 +72,7 @@ pub struct VaultSnapshot {
     pub ciphers: Vec<CipherView>,
     pub folders: Vec<FolderView>,
     pub organizations: Vec<OrganizationView>,
+    pub collections: Vec<CollectionView>,
 }
 
 /// Session state that survives locking (encrypted tokens & KDF params),
