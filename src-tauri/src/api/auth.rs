@@ -115,14 +115,16 @@ pub async fn login_with_password(
     let raw_body = response.text().await.unwrap_or_default();
 
     if status.is_success() {
-        let token_resp: TokenResponse = serde_json::from_str(&raw_body).map_err(|e| {
-            AppError::Network(format!("Failed to parse token response JSON: {e}"))
-        })?;
+        let token_resp: TokenResponse = serde_json::from_str(&raw_body)
+            .map_err(|e| AppError::Network(format!("Failed to parse token response JSON: {e}")))?;
         return Ok(token_resp);
     }
 
     let lower = raw_body.to_ascii_lowercase();
-    if lower.contains("twofactor") || lower.contains("two-step") || lower.contains("twofactorproviders") {
+    if lower.contains("twofactor")
+        || lower.contains("two-step")
+        || lower.contains("twofactorproviders")
+    {
         return Err(AppError::TwoFactorRequired);
     }
 

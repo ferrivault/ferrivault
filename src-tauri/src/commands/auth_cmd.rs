@@ -82,8 +82,7 @@ pub async fn login(
         ));
     }
 
-    let endpoints =
-        ServerEndpoints::resolve(payload.region, payload.custom_server_url.as_deref())?;
+    let endpoints = ServerEndpoints::resolve(payload.region, payload.custom_server_url.as_deref())?;
 
     let kdf_params = fetch_prelogin(&state.http_client, &endpoints, &email).await?;
     let master_key = derive_master_key(&payload.master_password, &email, &kdf_params)?;
@@ -163,7 +162,12 @@ pub async fn unlock_vault(
     let sync_resp = match &session.last_encrypted_sync {
         Some(cached) => cached.clone(),
         None => {
-            fetch_sync(&state.http_client, &session.endpoints, &session.access_token).await?
+            fetch_sync(
+                &state.http_client,
+                &session.endpoints,
+                &session.access_token,
+            )
+            .await?
         }
     };
 

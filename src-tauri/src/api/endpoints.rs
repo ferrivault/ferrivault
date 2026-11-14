@@ -49,7 +49,9 @@ impl ServerEndpoints {
                     .map(str::trim)
                     .filter(|s| !s.is_empty())
                     .ok_or_else(|| {
-                        AppError::Validation("Custom server URL is required for self-hosted mode".into())
+                        AppError::Validation(
+                            "Custom server URL is required for self-hosted mode".into(),
+                        )
                     })?;
 
                 let parsed = Url::parse(raw).map_err(|e| {

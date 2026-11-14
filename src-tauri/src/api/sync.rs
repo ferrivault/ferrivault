@@ -40,11 +40,7 @@ pub async fn fetch_sync(
     access_token: &str,
 ) -> Result<SyncResponse, AppError> {
     let url = format!("{}/sync?excludeDomains=true", endpoints.api_url);
-    let response = client
-        .get(&url)
-        .bearer_auth(access_token)
-        .send()
-        .await?;
+    let response = client.get(&url).bearer_auth(access_token).send().await?;
 
     if !response.status().is_success() {
         let status = response.status();

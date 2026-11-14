@@ -57,21 +57,31 @@ All user-facing text is managed through `i18next` JSON dictionaries located in `
 - **Node.js** (`20+`) and npm
 - Platform system dependencies for **Tauri v2** (on Linux: `libwebkit2gtk-4.1-dev`, `libappindicator3-dev`, `librsvg2-dev`, `patchelf`)
 
-### Commands
+### Commands (via `Makefile`)
 
 ```bash
-# Install frontend dependencies
-npm install
+# Show all available Make targets
+make help
 
-# Validate translation key parity (en, es, ca)
-npm run test:i18n
+# Install frontend dependencies and prefetch Rust crates
+make setup
 
-# Run Rust cryptographic & unit tests
-cd src-tauri && cargo test
+# Run all checks (formatting, Clippy, TypeScript, i18n parity, and unit tests)
+make check
 
 # Launch Tauri desktop application in development mode
-npm run tauri dev
+make dev
 
 # Build production desktop bundle
-npm run tauri build
+make build
 ```
+
+---
+
+## Documentation (`doc/`)
+
+Detailed technical documentation is located in the [`doc/`](./doc/README.md) directory:
+- [Architecture & IPC Design](./doc/architecture.md)
+- [Cryptography & Security Model](./doc/cryptography.md)
+- [Internationalization & Localization Guide (i18n)](./doc/i18n.md)
+- [Development & Build Guide](./doc/development.md)

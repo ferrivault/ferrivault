@@ -303,8 +303,7 @@ impl EncryptedCipher {
             ssn: decrypt_optional(enc_id.ssn.as_deref(), key).unwrap_or(None),
             passport_number: decrypt_optional(enc_id.passport_number.as_deref(), key)
                 .unwrap_or(None),
-            license_number: decrypt_optional(enc_id.license_number.as_deref(), key)
-                .unwrap_or(None),
+            license_number: decrypt_optional(enc_id.license_number.as_deref(), key).unwrap_or(None),
             address1: decrypt_optional(enc_id.address1.as_deref(), key).unwrap_or(None),
             address2: decrypt_optional(enc_id.address2.as_deref(), key).unwrap_or(None),
             city: decrypt_optional(enc_id.city.as_deref(), key).unwrap_or(None),

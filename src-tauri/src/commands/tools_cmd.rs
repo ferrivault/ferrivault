@@ -96,6 +96,7 @@ pub fn open_external_url(uri: String) -> Result<(), AppError> {
         format!("https://{trimmed}")
     };
 
-    open::that(&normalized)
-        .map_err(|e| AppError::Internal(format!("Failed to launch browser for '{normalized}': {e}")))
+    open::that(&normalized).map_err(|e| {
+        AppError::Internal(format!("Failed to launch browser for '{normalized}': {e}"))
+    })
 }

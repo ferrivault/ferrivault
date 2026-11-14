@@ -71,17 +71,18 @@ pub async fn save_cipher(
         let session_guard = state.session.read().await;
         let session = session_guard.as_ref().ok_or(AppError::VaultLocked)?;
         let key = session.vault_key.clone().ok_or(AppError::VaultLocked)?;
-        (
-            session.endpoints.clone(),
-            session.access_token.clone(),
-            key,
-        )
+        (session.endpoints.clone(), session.access_token.clone(), key)
     };
 
     let encrypted_payload = cipher.encrypt(&vault_key)?;
     let saved_encrypted = if cipher.id.trim().is_empty() {
-        create_cipher_remote(&state.http_client, &endpoints, &access_token, &encrypted_payload)
-            .await?
+        create_cipher_remote(
+            &state.http_client,
+            &endpoints,
+            &access_token,
+            &encrypted_payload,
+        )
+        .await?
     } else {
         update_cipher_remote(
             &state.http_client,
@@ -107,9 +108,7 @@ pub async fn save_cipher(
             } else {
                 snapshot.ciphers.push(saved_decrypted.clone());
             }
-            snapshot
-                .ciphers
-                .sort_by_key(|a| a.name.to_lowercase());
+            snapshot.ciphers.sort_by_key(|a| a.name.to_lowercase());
         }
     }
 
@@ -118,7 +117,10 @@ pub async fn save_cipher(
 
 /// Soft-deletes a cipher (moves it to Trash) and updates the local snapshot.
 #[tauri::command]
-pub async fn delete_cipher(id: String, state: State<'_, AppState>) -> Result<VaultSnapshot, AppError> {
+pub async fn delete_cipher(
+    id: String,
+    state: State<'_, AppState>,
+) -> Result<VaultSnapshot, AppError> {
     let (endpoints, access_token) = {
         let session_guard = state.session.read().await;
         let session = session_guard.as_ref().ok_or(AppError::VaultLocked)?;
@@ -194,18 +196,20 @@ pub async fn save_folder(
         let session_guard = state.session.read().await;
         let session = session_guard.as_ref().ok_or(AppError::VaultLocked)?;
         let key = session.vault_key.clone().ok_or(AppError::VaultLocked)?;
-        (
-            session.endpoints.clone(),
-            session.access_token.clone(),
-            key,
-        )
+        (session.endpoints.clone(), session.access_token.clone(), key)
     };
 
     let req = FolderRequest::from_plaintext(trimmed, &vault_key)?;
     let encrypted_folder = match id.as_deref().filter(|s| !s.is_empty()) {
         Some(folder_id) => {
-            update_folder_remote(&state.http_client, &endpoints, &access_token, folder_id, &req)
-                .await?
+            update_folder_remote(
+                &state.http_client,
+                &endpoints,
+                &access_token,
+                folder_id,
+                &req,
+            )
+            .await?
         }
         None => create_folder_remote(&state.http_client, &endpoints, &access_token, &req).await?,
     };
@@ -217,18 +221,12 @@ pub async fn save_folder(
     let mut session_guard = state.session.write().await;
     if let Some(session) = session_guard.as_mut() {
         if let Some(snapshot) = session.decrypted_snapshot.as_mut() {
-            if let Some(existing) = snapshot
-                .folders
-                .iter_mut()
-                .find(|f| f.id == folder_view.id)
-            {
+            if let Some(existing) = snapshot.folders.iter_mut().find(|f| f.id == folder_view.id) {
                 *existing = folder_view.clone();
             } else {
                 snapshot.folders.push(folder_view.clone());
             }
-            snapshot
-                .folders
-                .sort_by_key(|a| a.name.to_lowercase());
+            snapshot.folders.sort_by_key(|a| a.name.to_lowercase());
         }
     }
 

@@ -105,8 +105,9 @@ pub fn parse_totp_input(input: &str) -> Result<TotpConfig, AppError> {
             }
         }
 
-        let raw_secret = secret_str
-            .ok_or_else(|| AppError::Validation("Missing 'secret' parameter in otpauth URI".into()))?;
+        let raw_secret = secret_str.ok_or_else(|| {
+            AppError::Validation("Missing 'secret' parameter in otpauth URI".into())
+        })?;
         let secret = decode_base32_secret(&raw_secret)?;
         Ok(TotpConfig {
             secret,
@@ -126,7 +127,11 @@ pub fn parse_totp_input(input: &str) -> Result<TotpConfig, AppError> {
 }
 
 /// Computes the HMAC digest for the 8-byte big-endian counter.
-fn compute_hmac(algorithm: TotpAlgorithm, secret: &[u8], counter_bytes: &[u8; 8]) -> Result<Vec<u8>, AppError> {
+fn compute_hmac(
+    algorithm: TotpAlgorithm,
+    secret: &[u8],
+    counter_bytes: &[u8; 8],
+) -> Result<Vec<u8>, AppError> {
     match algorithm {
         TotpAlgorithm::Sha1 => {
             let mut mac = Hmac::<Sha1>::new_from_slice(secret)
