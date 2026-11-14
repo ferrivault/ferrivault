@@ -1,15 +1,15 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  CreditCard,
-  FileText,
-  Globe,
-  Plus,
-  Search,
-  Star,
-  UserCheck,
-  X,
-} from "lucide-react";
+  CreditCardIcon,
+  FileTextIcon,
+  GlobeIcon,
+  PlusIcon,
+  SearchIcon,
+  StarIcon,
+  UserCheckIcon,
+  XIcon,
+} from "@animateicons/react/lucide";
 import { extractHostname } from "../../lib/utils";
 import { useVaultStore } from "../../stores/vaultStore";
 import type { CipherView } from "../../types/vault";
@@ -82,15 +82,15 @@ export const CipherList: React.FC = () => {
   const renderIcon = (type: number) => {
     switch (type) {
       case 1:
-        return <Globe className="h-4 w-4 text-brand-400" />;
+        return <GlobeIcon size={16} className="text-brand-400" />;
       case 2:
-        return <FileText className="h-4 w-4 text-emerald-400" />;
+        return <FileTextIcon size={16} className="text-emerald-400" />;
       case 3:
-        return <CreditCard className="h-4 w-4 text-purple-400" />;
+        return <CreditCardIcon size={16} className="text-purple-400" />;
       case 4:
-        return <UserCheck className="h-4 w-4 text-amber-400" />;
+        return <UserCheckIcon size={16} className="text-amber-400" />;
       default:
-        return <Globe className="h-4 w-4 text-slate-400" />;
+        return <GlobeIcon size={16} className="text-slate-400" />;
     }
   };
 
@@ -99,7 +99,9 @@ export const CipherList: React.FC = () => {
       {/* Search & New Button Header */}
       <div className="flex items-center gap-2 border-b border-slate-800/80 p-3">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-2.5 top-2.5 h-3.5 w-3.5 text-slate-500" />
+          <div className="pointer-events-none absolute left-2.5 top-2 text-slate-500">
+            <SearchIcon size={14} />
+          </div>
           <input
             type="text"
             value={searchQuery}
@@ -113,7 +115,7 @@ export const CipherList: React.FC = () => {
               onClick={() => setSearchQuery("")}
               className="absolute right-2 top-2 text-slate-500 hover:text-slate-300"
             >
-              <X className="h-3.5 w-3.5" />
+              <XIcon size={14} />
             </button>
           )}
         </div>
@@ -124,7 +126,7 @@ export const CipherList: React.FC = () => {
           title={t("vault.newItem")}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white shadow transition hover:bg-brand-500"
         >
-          <Plus className="h-4 w-4" />
+          <PlusIcon size={16} />
         </button>
       </div>
 
@@ -165,7 +167,10 @@ export const CipherList: React.FC = () => {
                       {cipher.name}
                     </span>
                     {cipher.favorite && (
-                      <Star className="h-3 w-3 shrink-0 fill-amber-400 text-amber-400" />
+                      <StarIcon
+                        size={12}
+                        className="shrink-0 text-amber-400"
+                      />
                     )}
                   </div>
                   {subtitle && (

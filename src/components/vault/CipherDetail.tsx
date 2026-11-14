@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Copy,
-  Edit3,
-  ExternalLink,
-  Eye,
-  EyeOff,
-  Folder,
-  RotateCcw,
-  Shield,
-  Star,
-  Trash2,
-} from "lucide-react";
+  CopyIcon,
+  ExternalLinkIcon,
+  EyeIcon,
+  EyeOffIcon,
+  FolderIcon,
+  RotateCcwIcon,
+  ShieldIcon,
+  SquarePenIcon,
+  StarIcon,
+  Trash2Icon,
+} from "@animateicons/react/lucide";
 import { apiCopyToClipboard, apiOpenExternalUrl } from "../../lib/tauri";
 import { formatCardNumber, parseBackendError } from "../../lib/utils";
 import { useVaultStore } from "../../stores/vaultStore";
@@ -74,9 +74,9 @@ const DetailField: React.FC<DetailFieldProps> = ({
             className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-white"
           >
             {revealed ? (
-              <EyeOff className="h-4 w-4" />
+              <EyeOffIcon size={16} />
             ) : (
-              <Eye className="h-4 w-4" />
+              <EyeIcon size={16} />
             )}
           </button>
         )}
@@ -88,7 +88,7 @@ const DetailField: React.FC<DetailFieldProps> = ({
             title={t("common.launch")}
             className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-brand-400"
           >
-            <ExternalLink className="h-4 w-4" />
+            <ExternalLinkIcon size={16} />
           </button>
         )}
 
@@ -98,7 +98,7 @@ const DetailField: React.FC<DetailFieldProps> = ({
           title={t("common.copy")}
           className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-white"
         >
-          <Copy className="h-4 w-4" />
+          <CopyIcon size={16} />
         </button>
       </div>
     </div>
@@ -125,7 +125,7 @@ export const CipherDetail: React.FC = () => {
     return (
       <div className="flex flex-1 flex-col items-center justify-center bg-slate-950 p-8 text-center">
         <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-slate-500">
-          <Shield className="h-6 w-6" />
+          <ShieldIcon size={24} />
         </div>
         <h3 className="text-sm font-semibold text-slate-300">
           {t("vault.selectItemTitle")}
@@ -188,11 +188,11 @@ export const CipherDetail: React.FC = () => {
           <div className="flex items-center gap-2">
             <h2 className="text-xl font-bold text-white">{cipher.name}</h2>
             {cipher.favorite && (
-              <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <StarIcon size={16} className="text-amber-400" />
             )}
           </div>
           <div className="mt-1.5 flex items-center gap-2 text-xs text-slate-400">
-            <Folder className="h-3.5 w-3.5" />
+            <FolderIcon size={14} />
             <span>{folderName}</span>
           </div>
         </div>
@@ -206,7 +206,7 @@ export const CipherDetail: React.FC = () => {
                 onClick={() => startEditCipher(cipher)}
                 className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-semibold text-slate-100 transition hover:bg-slate-700"
               >
-                <Edit3 className="h-3.5 w-3.5" />
+                <SquarePenIcon size={14} />
                 {t("common.edit")}
               </button>
 
@@ -216,7 +216,7 @@ export const CipherDetail: React.FC = () => {
                 title={t("vault.moveToTrash")}
                 className="flex items-center gap-1.5 rounded-lg border border-red-500/30 bg-red-950/30 px-3 py-1.5 text-xs font-medium text-red-300 transition hover:bg-red-900/40"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2Icon size={14} />
                 {t("common.delete")}
               </button>
             </>
@@ -227,7 +227,7 @@ export const CipherDetail: React.FC = () => {
                 onClick={() => void handleRestore()}
                 className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-500"
               >
-                <RotateCcw className="h-3.5 w-3.5" />
+                <RotateCcwIcon size={14} />
                 {t("vault.restoreItem")}
               </button>
 
@@ -254,7 +254,7 @@ export const CipherDetail: React.FC = () => {
                   onClick={() => setConfirmingPermDelete(true)}
                   className="flex items-center gap-1.5 rounded-lg border border-red-500/40 bg-red-950/40 px-3 py-1.5 text-xs font-medium text-red-300 hover:bg-red-900/50"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2Icon size={14} />
                   {t("vault.permanentDelete")}
                 </button>
               )}
@@ -339,9 +339,9 @@ export const CipherDetail: React.FC = () => {
                     className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
                   >
                     {revealCardNumber ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOffIcon size={16} />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <EyeIcon size={16} />
                     )}
                   </button>
                   <button
@@ -361,7 +361,7 @@ export const CipherDetail: React.FC = () => {
                     }}
                     className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-800 hover:text-white"
                   >
-                    <Copy className="h-4 w-4" />
+                    <CopyIcon size={16} />
                   </button>
                 </div>
               </div>

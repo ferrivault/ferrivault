@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { listen } from "@tauri-apps/api/event";
-import { CheckCircle2, AlertCircle, Info } from "lucide-react";
+import {
+  CircleAlertIcon,
+  CircleCheckIcon,
+  InfoIcon,
+} from "@animateicons/react/lucide";
 import { isTauriRuntime } from "./lib/tauri";
 import { useAuthStore } from "./stores/authStore";
 import { useSettingsStore } from "./stores/settingsStore";
@@ -64,7 +68,14 @@ export default function App(): React.ReactElement {
         void p.then((unlisten) => unlisten());
       }
     };
-  }, [openGenerator, syncVault, clearVaultMemory, markLockedFromBackend, pushToast, t]);
+  }, [
+    openGenerator,
+    syncVault,
+    clearVaultMemory,
+    markLockedFromBackend,
+    pushToast,
+    t,
+  ]);
 
   return (
     <div className="relative flex h-screen w-screen overflow-hidden bg-slate-950 text-slate-100">
@@ -96,13 +107,13 @@ export default function App(): React.ReactElement {
             className="flex items-center gap-2 rounded-xl border border-slate-700/80 bg-slate-900/95 px-4 py-2.5 text-xs font-medium text-slate-100 shadow-xl backdrop-blur"
           >
             {toast.variant === "success" && (
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <CircleCheckIcon size={16} className="text-emerald-400" />
             )}
             {toast.variant === "error" && (
-              <AlertCircle className="h-4 w-4 text-red-400" />
+              <CircleAlertIcon size={16} className="text-red-400" />
             )}
             {toast.variant === "info" && (
-              <Info className="h-4 w-4 text-brand-400" />
+              <InfoIcon size={16} className="text-brand-400" />
             )}
             <span>{toast.text}</span>
           </div>

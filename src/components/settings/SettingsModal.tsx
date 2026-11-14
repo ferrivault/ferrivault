@@ -1,13 +1,13 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Globe,
-  Info,
-  Monitor,
-  Settings,
-  Shield,
-  X,
-} from "lucide-react";
+  GlobeIcon,
+  InfoIcon,
+  MonitorIcon,
+  SettingsIcon,
+  ShieldIcon,
+  XIcon,
+} from "@animateicons/react/lucide";
 import { SUPPORTED_LOCALES } from "../../i18n/config";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { useVaultStore } from "../../stores/vaultStore";
@@ -34,7 +34,7 @@ export const SettingsModal: React.FC = () => {
         <div className="flex items-center justify-between border-b border-slate-800 pb-4">
           <div className="flex items-center gap-2.5">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600/20 text-brand-400">
-              <Settings className="h-5 w-5" />
+              <SettingsIcon size={20} />
             </div>
             <h2 className="text-base font-bold text-white">
               {t("settings.title")}
@@ -46,7 +46,7 @@ export const SettingsModal: React.FC = () => {
             onClick={closeSettings}
             className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
           >
-            <X className="h-5 w-5" />
+            <XIcon size={20} />
           </button>
         </div>
 
@@ -54,7 +54,7 @@ export const SettingsModal: React.FC = () => {
           {/* Language & Localization */}
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <div className="mb-2.5 flex items-center gap-2 font-semibold text-slate-200">
-              <Globe className="h-4 w-4 text-brand-400" />
+              <GlobeIcon size={16} className="text-brand-400" />
               <span>{t("settings.languageSection")}</span>
             </div>
 
@@ -82,7 +82,7 @@ export const SettingsModal: React.FC = () => {
           {/* Security & Clipboard */}
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <div className="mb-2.5 flex items-center gap-2 font-semibold text-slate-200">
-              <Shield className="h-4 w-4 text-brand-400" />
+              <ShieldIcon size={16} className="text-brand-400" />
               <span>{t("settings.securitySection")}</span>
             </div>
 
@@ -135,7 +135,7 @@ export const SettingsModal: React.FC = () => {
           {/* System Tray Integration */}
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <div className="mb-2.5 flex items-center gap-2 font-semibold text-slate-200">
-              <Monitor className="h-4 w-4 text-brand-400" />
+              <MonitorIcon size={16} className="text-brand-400" />
               <span>{t("settings.traySection")}</span>
             </div>
 
@@ -162,7 +162,7 @@ export const SettingsModal: React.FC = () => {
           {/* About */}
           <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
             <div className="mb-1.5 flex items-center gap-2 font-semibold text-slate-200">
-              <Info className="h-4 w-4 text-brand-400" />
+              <InfoIcon size={16} className="text-brand-400" />
               <span>
                 {t("settings.aboutSection")} ({t("app.version")})
               </span>

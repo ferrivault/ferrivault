@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  CreditCard,
-  FileText,
-  Folder,
-  FolderOpen,
-  Globe,
-  KeyRound,
-  Layers,
-  Lock,
-  LogOut,
-  Plus,
-  RefreshCw,
-  Settings,
-  ShieldCheck,
-  Star,
-  Trash2,
-  UserCheck,
-  Check,
-  X,
-} from "lucide-react";
+  CheckIcon,
+  CreditCardIcon,
+  FileTextIcon,
+  FolderIcon,
+  FolderOpenIcon,
+  GlobeIcon,
+  KeyRoundIcon,
+  LayersIcon,
+  LockIcon,
+  LogOutIcon,
+  PlusIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  ShieldCheckIcon,
+  StarIcon,
+  Trash2Icon,
+  UserCheckIcon,
+  XIcon,
+} from "@animateicons/react/lucide";
 import { parseBackendError } from "../../lib/utils";
 import { useAuthStore } from "../../stores/authStore";
 import { useVaultStore } from "../../stores/vaultStore";
@@ -117,7 +117,7 @@ export const Sidebar: React.FC = () => {
       <div className="flex items-center justify-between border-b border-slate-800/80 px-4 py-3.5">
         <div className="flex items-center gap-2.5 overflow-hidden">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-white shadow">
-            <ShieldCheck className="h-4 w-4" />
+            <ShieldCheckIcon size={16} />
           </div>
           <div className="truncate">
             <div className="text-sm font-bold text-white">{t("app.name")}</div>
@@ -142,7 +142,7 @@ export const Sidebar: React.FC = () => {
             }`}
           >
             <span className="flex items-center gap-2.5">
-              <Layers className="h-4 w-4" />
+              <LayersIcon size={16} />
               {t("sidebar.allItems")}
             </span>
             <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
@@ -160,7 +160,7 @@ export const Sidebar: React.FC = () => {
             }`}
           >
             <span className="flex items-center gap-2.5">
-              <Star className="h-4 w-4 text-amber-400" />
+              <StarIcon size={16} className="text-amber-400" />
               {t("sidebar.favorites")}
             </span>
             <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
@@ -178,7 +178,7 @@ export const Sidebar: React.FC = () => {
             }`}
           >
             <span className="flex items-center gap-2.5">
-              <Trash2 className="h-4 w-4 text-red-400" />
+              <Trash2Icon size={16} className="text-red-400" />
               {t("sidebar.trash")}
             </span>
             <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
@@ -195,10 +195,14 @@ export const Sidebar: React.FC = () => {
           <div className="space-y-1">
             {(
               [
-                { type: 1, label: t("sidebar.typeLogin"), Icon: Globe },
-                { type: 2, label: t("sidebar.typeNote"), Icon: FileText },
-                { type: 3, label: t("sidebar.typeCard"), Icon: CreditCard },
-                { type: 4, label: t("sidebar.typeIdentity"), Icon: UserCheck },
+                { type: 1, label: t("sidebar.typeLogin"), Icon: GlobeIcon },
+                { type: 2, label: t("sidebar.typeNote"), Icon: FileTextIcon },
+                { type: 3, label: t("sidebar.typeCard"), Icon: CreditCardIcon },
+                {
+                  type: 4,
+                  label: t("sidebar.typeIdentity"),
+                  Icon: UserCheckIcon,
+                },
               ] as const
             ).map(({ type, label, Icon }) => {
               const count = activeCiphers.filter((c) => c.type === type).length;
@@ -216,7 +220,7 @@ export const Sidebar: React.FC = () => {
                   }`}
                 >
                   <span className="flex items-center gap-2.5">
-                    <Icon className="h-4 w-4 text-slate-400" />
+                    <Icon size={16} className="text-slate-400" />
                     {label}
                   </span>
                   <span className="text-[10px] text-slate-500">{count}</span>
@@ -238,7 +242,7 @@ export const Sidebar: React.FC = () => {
               title={t("sidebar.addFolder")}
               className="rounded p-0.5 text-slate-400 hover:bg-slate-800 hover:text-white"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <PlusIcon size={14} />
             </button>
           </div>
 
@@ -259,14 +263,14 @@ export const Sidebar: React.FC = () => {
                 type="submit"
                 className="rounded bg-brand-600 p-1 text-white hover:bg-brand-500"
               >
-                <Check className="h-3.5 w-3.5" />
+                <CheckIcon size={14} />
               </button>
               <button
                 type="button"
                 onClick={() => setIsAddingFolder(false)}
                 className="rounded bg-slate-800 p-1 text-slate-400 hover:text-white"
               >
-                <X className="h-3.5 w-3.5" />
+                <XIcon size={14} />
               </button>
             </form>
           )}
@@ -289,7 +293,7 @@ export const Sidebar: React.FC = () => {
                   }`}
                 >
                   <span className="flex items-center gap-2.5 truncate">
-                    <Folder className="h-4 w-4 shrink-0 text-slate-400" />
+                    <FolderIcon size={16} className="shrink-0 text-slate-400" />
                     <span className="truncate">{folder.name}</span>
                   </span>
                   <div className="flex items-center gap-1">
@@ -300,7 +304,7 @@ export const Sidebar: React.FC = () => {
                       title={t("sidebar.deleteFolder")}
                       className="hidden rounded p-0.5 text-slate-500 hover:text-red-400 group-hover:inline-block"
                     >
-                      <Trash2 className="h-3 w-3" />
+                      <Trash2Icon size={12} />
                     </button>
                   </div>
                 </div>
@@ -318,7 +322,7 @@ export const Sidebar: React.FC = () => {
               }`}
             >
               <span className="flex items-center gap-2.5">
-                <FolderOpen className="h-4 w-4 text-slate-500" />
+                <FolderOpenIcon size={16} className="text-slate-500" />
                 {t("sidebar.noFolder")}
               </span>
               <span className="text-[10px] text-slate-500">
@@ -339,7 +343,7 @@ export const Sidebar: React.FC = () => {
               onClick={() => openGenerator()}
               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 font-medium text-slate-300 transition hover:bg-slate-800/60"
             >
-              <KeyRound className="h-4 w-4 text-brand-400" />
+              <KeyRoundIcon size={16} className="text-brand-400" />
               {t("sidebar.passwordGenerator")}
             </button>
 
@@ -349,10 +353,11 @@ export const Sidebar: React.FC = () => {
               disabled={isSyncing}
               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 font-medium text-slate-300 transition hover:bg-slate-800/60 disabled:opacity-50"
             >
-              <RefreshCw
-                className={`h-4 w-4 text-slate-400 ${
-                  isSyncing ? "animate-spin text-brand-400" : ""
-                }`}
+              <RefreshCwIcon
+                size={16}
+                className={
+                  isSyncing ? "animate-spin text-brand-400" : "text-slate-400"
+                }
               />
               {isSyncing ? t("sidebar.syncing") : t("sidebar.syncVault")}
             </button>
@@ -362,7 +367,7 @@ export const Sidebar: React.FC = () => {
               onClick={openSettings}
               className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 font-medium text-slate-300 transition hover:bg-slate-800/60"
             >
-              <Settings className="h-4 w-4 text-slate-400" />
+              <SettingsIcon size={16} className="text-slate-400" />
               {t("sidebar.settings")}
             </button>
           </div>
@@ -376,7 +381,7 @@ export const Sidebar: React.FC = () => {
           onClick={() => void handleLock()}
           className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 font-medium text-slate-300 transition hover:bg-slate-800 hover:text-white"
         >
-          <Lock className="h-3.5 w-3.5 text-amber-400" />
+          <LockIcon size={14} className="text-amber-400" />
           {t("auth.lockButton")}
         </button>
 
@@ -386,7 +391,7 @@ export const Sidebar: React.FC = () => {
           title={t("auth.logoutButton")}
           className="rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-800 hover:text-red-400"
         >
-          <LogOut className="h-4 w-4" />
+          <LogOutIcon size={16} />
         </button>
       </div>
     </aside>

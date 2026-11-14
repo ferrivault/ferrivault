@@ -11,12 +11,16 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum AppError {
     /// Invalid email, master password, or two-factor authentication token.
-    #[error("Invalid credentials: {0}")]
+    #[error("{0}")]
     InvalidCredentials(String),
 
     /// Two-step login code is required by the Bitwarden/Vaultwarden server.
     #[error("Two-factor authentication code is required")]
     TwoFactorRequired,
+
+    /// New Device Verification OTP (sent via email by Bitwarden) is required.
+    #[error("New device verification code sent to your email is required")]
+    NewDeviceVerificationRequired,
 
     /// Network or HTTP failure while communicating with the Bitwarden/Vaultwarden server.
     #[error("Network error: {0}")]
@@ -45,6 +49,7 @@ impl AppError {
         match self {
             Self::InvalidCredentials(_) => "errors.invalidCredentials",
             Self::TwoFactorRequired => "errors.twoFactorRequired",
+            Self::NewDeviceVerificationRequired => "errors.newDeviceVerificationRequired",
             Self::Network(_) => "errors.networkError",
             Self::Crypto(_) => "errors.cryptoError",
             Self::VaultLocked => "errors.vaultLocked",

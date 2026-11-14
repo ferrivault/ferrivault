@@ -97,8 +97,23 @@ pub struct AppState {
 impl AppState {
     /// Initializes a fresh `AppState` with a shared rustls `reqwest::Client`.
     pub fn new() -> Self {
+        let mut default_headers = reqwest::header::HeaderMap::new();
+        default_headers.insert(
+            "Bitwarden-Client-Name",
+            reqwest::header::HeaderValue::from_static("desktop"),
+        );
+        default_headers.insert(
+            "Bitwarden-Client-Version",
+            reqwest::header::HeaderValue::from_static("2024.12.0"),
+        );
+        default_headers.insert(
+            "Device-Type",
+            reqwest::header::HeaderValue::from_static("8"),
+        );
+
         let http_client = Client::builder()
-            .user_agent("Rustwarden/0.1.0 (Desktop; Linux)")
+            .user_agent("Mozilla/5.0 (X11; Linux x86_64) Bitwarden/2024.12.0")
+            .default_headers(default_headers)
             .build()
             .unwrap_or_else(|_| Client::new());
 

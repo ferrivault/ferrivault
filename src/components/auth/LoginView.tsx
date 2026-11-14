@@ -1,22 +1,71 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Globe,
-  KeyRound,
-  Lock,
-  Mail,
-  Server,
-  ShieldCheck,
-  Eye,
-  EyeOff,
-  AlertCircle,
-} from "lucide-react";
+  CircleAlertIcon,
+  EyeIcon,
+  EyeOffIcon,
+  GlobeIcon,
+  KeyRoundIcon,
+  LockIcon,
+  MailIcon,
+  ServerIcon,
+  ShieldCheckIcon,
+} from "@animateicons/react/lucide";
 import { SUPPORTED_LOCALES } from "../../i18n/config";
 import { parseBackendError } from "../../lib/utils";
 import { useAuthStore } from "../../stores/authStore";
 import { useSettingsStore } from "../../stores/settingsStore";
 import { useVaultStore } from "../../stores/vaultStore";
 import type { ServerRegion } from "../../types/auth";
+
+/**
+ * Crisp inline SVG US flag badge.
+ */
+const UsFlagSvg: React.FC = () => (
+  <svg
+    viewBox="0 0 28 20"
+    className="h-4 w-6 shrink-0 rounded-[3px] shadow-sm ring-1 ring-white/15"
+    aria-hidden="true"
+  >
+    <rect width="28" height="20" fill="#B22234" />
+    <path
+      d="M0 2.5h28M0 6.5h28M0 10.5h28M0 14.5h28M0 18.5h28"
+      stroke="#FFFFFF"
+      strokeWidth="1.6"
+    />
+    <rect width="12" height="11" fill="#3C3B6E" />
+    <circle cx="3" cy="3" r="0.8" fill="#FFFFFF" />
+    <circle cx="6" cy="3" r="0.8" fill="#FFFFFF" />
+    <circle cx="9" cy="3" r="0.8" fill="#FFFFFF" />
+    <circle cx="4.5" cy="5.5" r="0.8" fill="#FFFFFF" />
+    <circle cx="7.5" cy="5.5" r="0.8" fill="#FFFFFF" />
+    <circle cx="3" cy="8" r="0.8" fill="#FFFFFF" />
+    <circle cx="6" cy="8" r="0.8" fill="#FFFFFF" />
+    <circle cx="9" cy="8" r="0.8" fill="#FFFFFF" />
+  </svg>
+);
+
+/**
+ * Crisp inline SVG European Union flag badge.
+ */
+const EuFlagSvg: React.FC = () => (
+  <svg
+    viewBox="0 0 28 20"
+    className="h-4 w-6 shrink-0 rounded-[3px] shadow-sm ring-1 ring-white/15"
+    aria-hidden="true"
+  >
+    <rect width="28" height="20" fill="#003399" />
+    <circle
+      cx="14"
+      cy="10"
+      r="5.5"
+      fill="none"
+      stroke="#FFCC00"
+      strokeWidth="1.5"
+      strokeDasharray="1.3 1.6"
+    />
+  </svg>
+);
 
 export const LoginView: React.FC = () => {
   const { t } = useTranslation();
@@ -32,6 +81,7 @@ export const LoginView: React.FC = () => {
   const [twoFactorCode, setTwoFactorCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorText, setErrorText] = useState<string | null>(null);
+  const [highlightCodeInput, setHighlightCodeInput] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +108,12 @@ export const LoginView: React.FC = () => {
       setSnapshot(snapshot);
     } catch (err) {
       const parsed = parseBackendError(err);
+      if (
+        parsed.errorKey === "errors.twoFactorRequired" ||
+        parsed.errorKey === "errors.newDeviceVerificationRequired"
+      ) {
+        setHighlightCodeInput(true);
+      }
       setErrorText(
         t(parsed.errorKey, {
           message: parsed.message,
@@ -67,13 +123,39 @@ export const LoginView: React.FC = () => {
     }
   };
 
+  const serverOptions: Array<{
+    id: ServerRegion;
+    title: string;
+    subtitle: string;
+    badge: React.ReactNode;
+  }> = [
+    {
+      id: "officialUs",
+      title: t("auth.serverUsShort"),
+      subtitle: "bitwarden.com",
+      badge: <UsFlagSvg />,
+    },
+    {
+      id: "officialEu",
+      title: t("auth.serverEuShort"),
+      subtitle: "bitwarden.eu",
+      badge: <EuFlagSvg />,
+    },
+    {
+      id: "selfHosted",
+      title: t("auth.serverSelfHostedShort"),
+      subtitle: "Vaultwarden",
+      badge: <ServerIcon size={18} className="text-brand-400" />,
+    },
+  ];
+
   return (
     <div className="flex h-screen w-screen flex-col justify-between bg-slate-950 p-6 text-slate-100">
       {/* Top Bar with Language Switcher */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-white shadow-md shadow-brand-600/30">
-            <ShieldCheck className="h-5 w-5" />
+            <ShieldCheckIcon size={20} />
           </div>
           <div>
             <span className="text-lg font-bold tracking-tight text-white">
@@ -85,13 +167,13 @@ export const LoginView: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900/80 px-3 py-1.5">
-          <Globe className="h-4 w-4 text-slate-400" />
+        <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5">
+          <GlobeIcon size={16} className="text-slate-400" />
           <select
             aria-label={t("settings.languageLabel")}
             value={locale}
             onChange={(e) => void changeLanguage(e.target.value)}
-            className="bg-transparent text-xs font-medium text-slate-200 focus:outline-none"
+            className="bg-slate-900 text-xs font-medium text-slate-100 focus:outline-none"
           >
             {SUPPORTED_LOCALES.map((loc) => (
               <option
@@ -119,28 +201,66 @@ export const LoginView: React.FC = () => {
 
         {errorText && (
           <div className="mb-4 flex items-start gap-2.5 rounded-lg border border-red-500/40 bg-red-950/50 p-3 text-xs text-red-200">
-            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-400" />
+            <CircleAlertIcon size={16} className="mt-0.5 shrink-0 text-red-400" />
             <span>{errorText}</span>
           </div>
         )}
 
         <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
-          {/* Server Environment Selector */}
+          {/* Server Environment Radio Cards with Flags */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-slate-300">
+            <label className="mb-2 block text-xs font-medium text-slate-300">
               {t("auth.serverRegion")}
             </label>
-            <div className="relative">
-              <Server className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
-              <select
-                value={region}
-                onChange={(e) => setRegion(e.target.value as ServerRegion)}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-sm text-slate-100 focus:border-brand-500 focus:outline-none"
-              >
-                <option value="officialUs">{t("auth.serverOfficialUs")}</option>
-                <option value="officialEu">{t("auth.serverOfficialEu")}</option>
-                <option value="selfHosted">{t("auth.serverSelfHosted")}</option>
-              </select>
+            <div
+              role="radiogroup"
+              aria-label={t("auth.serverRegion")}
+              className="grid grid-cols-3 gap-2.5"
+            >
+              {serverOptions.map((opt) => {
+                const active = region === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => setRegion(opt.id)}
+                    className={`group relative flex flex-col items-start justify-between rounded-xl border p-3 text-left transition ${
+                      active
+                        ? "border-brand-500 bg-brand-600/15 shadow-sm shadow-brand-500/20"
+                        : "border-slate-800 bg-slate-950/90 hover:border-slate-700 hover:bg-slate-900"
+                    }`}
+                  >
+                    <div className="flex w-full items-center justify-between">
+                      {opt.badge}
+                      <span
+                        className={`flex h-3.5 w-3.5 items-center justify-center rounded-full border ${
+                          active
+                            ? "border-brand-400 bg-brand-500"
+                            : "border-slate-600 bg-transparent"
+                        }`}
+                      >
+                        {active && (
+                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                        )}
+                      </span>
+                    </div>
+                    <div className="mt-2.5">
+                      <div
+                        className={`text-xs font-semibold ${
+                          active ? "text-white" : "text-slate-200"
+                        }`}
+                      >
+                        {opt.title}
+                      </div>
+                      <div className="text-[10px] text-slate-400">
+                        {opt.subtitle}
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -166,7 +286,9 @@ export const LoginView: React.FC = () => {
               {t("auth.email")}
             </label>
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+                <MailIcon size={16} />
+              </div>
               <input
                 type="email"
                 required
@@ -185,7 +307,9 @@ export const LoginView: React.FC = () => {
               {t("auth.masterPassword")}
             </label>
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+                <LockIcon size={16} />
+              </div>
               <input
                 type={showPassword ? "text" : "password"}
                 required
@@ -202,29 +326,35 @@ export const LoginView: React.FC = () => {
                 className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-200"
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4" />
+                  <EyeOffIcon size={16} />
                 ) : (
-                  <Eye className="h-4 w-4" />
+                  <EyeIcon size={16} />
                 )}
               </button>
             </div>
           </div>
 
-          {/* Optional 2FA TOTP Code */}
+          {/* 2FA / New Device Verification Code */}
           <div>
             <label className="mb-1.5 block text-xs font-medium text-slate-300">
               {t("auth.twoFactorCode")}{" "}
               <span className="text-slate-500">({t("common.optional")})</span>
             </label>
             <div className="relative">
-              <KeyRound className="pointer-events-none absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+              <div className="pointer-events-none absolute left-3 top-2.5 text-slate-400">
+                <KeyRoundIcon size={16} />
+              </div>
               <input
                 type="text"
                 inputMode="numeric"
                 value={twoFactorCode}
                 onChange={(e) => setTwoFactorCode(e.target.value)}
                 placeholder={t("auth.twoFactorPlaceholder")}
-                className="w-full rounded-lg border border-slate-700 bg-slate-950 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:border-brand-500 focus:outline-none"
+                className={`w-full rounded-lg border bg-slate-950 py-2 pl-9 pr-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none ${
+                  highlightCodeInput
+                    ? "border-amber-400 ring-1 ring-amber-400/40"
+                    : "border-slate-700 focus:border-brand-500"
+                }`}
               />
             </div>
             <p className="mt-1 text-[11px] text-slate-500">

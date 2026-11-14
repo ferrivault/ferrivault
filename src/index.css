@@ -3,6 +3,17 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  select,
+  option {
+    color-scheme: dark;
+    background-color: #090d16;
+    color: #f1f5f9;
+  }
+
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;

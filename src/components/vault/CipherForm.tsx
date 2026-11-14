@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  Eye,
-  EyeOff,
-  KeyRound,
-  Plus,
-  Save,
-  Trash2,
-  X,
-} from "lucide-react";
+  EyeIcon,
+  EyeOffIcon,
+  KeyRoundIcon,
+  PlusIcon,
+  SaveIcon,
+  Trash2Icon,
+  XIcon,
+} from "@animateicons/react/lucide";
 import { parseBackendError } from "../../lib/utils";
 import {
   createBlankCipher,
@@ -116,7 +116,7 @@ export const CipherForm: React.FC = () => {
             onClick={cancelEditCipher}
             className="flex items-center gap-1.5 rounded-lg border border-slate-700 px-3 py-1.5 font-medium text-slate-300 hover:bg-slate-800"
           >
-            <X className="h-3.5 w-3.5" />
+            <XIcon size={14} />
             {t("common.cancel")}
           </button>
 
@@ -125,7 +125,7 @@ export const CipherForm: React.FC = () => {
             disabled={isSaving}
             className="flex items-center gap-1.5 rounded-lg bg-brand-600 px-4 py-1.5 font-semibold text-white shadow hover:bg-brand-500 disabled:opacity-50"
           >
-            <Save className="h-3.5 w-3.5" />
+            <SaveIcon size={14} />
             {t("common.save")}
           </button>
         </div>
@@ -257,9 +257,9 @@ export const CipherForm: React.FC = () => {
                     className="absolute right-2.5 top-2 text-slate-400 hover:text-white"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOffIcon size={16} />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <EyeIcon size={16} />
                     )}
                   </button>
                 </div>
@@ -277,7 +277,7 @@ export const CipherForm: React.FC = () => {
                   title={t("common.generate")}
                   className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 font-medium text-brand-300 hover:bg-slate-700"
                 >
-                  <KeyRound className="h-3.5 w-3.5" />
+                  <KeyRoundIcon size={14} />
                   {t("common.generate")}
                 </button>
               </div>
@@ -320,7 +320,7 @@ export const CipherForm: React.FC = () => {
                   }
                   className="flex items-center gap-1 text-brand-400 hover:text-brand-300"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <PlusIcon size={14} />
                   {t("vault.login.addUri")}
                 </button>
               </div>
@@ -358,7 +358,7 @@ export const CipherForm: React.FC = () => {
                     }
                     className="rounded p-1.5 text-slate-500 hover:text-red-400"
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
+                    <Trash2Icon size={14} />
                   </button>
                 </div>
               ))}
@@ -491,9 +491,9 @@ export const CipherForm: React.FC = () => {
                     className="absolute right-2 top-2 text-slate-400"
                   >
                     {showCvv ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOffIcon size={16} />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <EyeIcon size={16} />
                     )}
                   </button>
                 </div>
@@ -697,7 +697,7 @@ export const CipherForm: React.FC = () => {
               onClick={addCustomField}
               className="flex items-center gap-1 text-brand-400 hover:text-brand-300"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <PlusIcon size={14} />
               {t("vault.addCustomField")}
             </button>
           </div>
@@ -737,7 +737,7 @@ export const CipherForm: React.FC = () => {
                 onClick={() => removeCustomField(idx)}
                 className="rounded p-1.5 text-slate-500 hover:text-red-400"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2Icon size={14} />
               </button>
             </div>
           ))}

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Copy, Check, ShieldAlert, Clock } from "lucide-react";
+import {
+  CheckIcon,
+  ClockIcon,
+  CopyIcon,
+  ShieldAlertIcon,
+} from "@animateicons/react/lucide";
 import { apiCopyToClipboard, apiGenerateTotp } from "../../lib/tauri";
 import { useVaultStore } from "../../stores/vaultStore";
 import type { TotpResponse } from "../../types/vault";
@@ -59,7 +64,7 @@ export const TotpBadge: React.FC<TotpBadgeProps> = ({ secretOrUri }) => {
   if (hasError) {
     return (
       <div className="flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-950/30 px-3 py-2 text-xs text-amber-300">
-        <ShieldAlert className="h-4 w-4 shrink-0" />
+        <ShieldAlertIcon size={16} className="shrink-0" />
         <span>{t("errors.cryptoError")}</span>
       </div>
     );
@@ -97,10 +102,9 @@ export const TotpBadge: React.FC<TotpBadgeProps> = ({ secretOrUri }) => {
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs text-slate-400">
-            <Clock
-              className={`h-3.5 w-3.5 ${
-                isExpiringSoon ? "text-amber-400" : "text-slate-400"
-              }`}
+            <ClockIcon
+              size={14}
+              className={isExpiringSoon ? "text-amber-400" : "text-slate-400"}
             />
             <span>
               {t("vault.login.totpExpiresIn", {
@@ -116,9 +120,9 @@ export const TotpBadge: React.FC<TotpBadgeProps> = ({ secretOrUri }) => {
             className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white"
           >
             {copied ? (
-              <Check className="h-3.5 w-3.5 text-emerald-400" />
+              <CheckIcon size={14} className="text-emerald-400" />
             ) : (
-              <Copy className="h-3.5 w-3.5" />
+              <CopyIcon size={14} />
             )}
             {t("common.copy")}
           </button>
