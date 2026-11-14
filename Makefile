@@ -10,7 +10,7 @@ TAURI_MANIFEST := src-tauri/Cargo.toml
 
 .PHONY: help setup install dev dev-frontend build build-frontend build-debug \
         test test-rust test-i18n lint lint-rust lint-frontend fmt fmt-check \
-        check clean
+        check memory clean
 
 ## Display all available Make targets
 help:
@@ -30,6 +30,7 @@ help:
 	@echo "  make fmt             Format Rust code with rustfmt"
 	@echo "  make fmt-check       Check Rust formatting without modifying files"
 	@echo "  make check           Run full verification suite (fmt-check + lint + test + build-frontend)"
+	@echo "  make memory          Measure RAM (USS/PSS/RSS) of FerriVault vs Bitwarden & bundle sizes"
 	@echo "  make clean           Remove build artifacts (dist/ and src-tauri/target/)"
 	@echo ""
 
@@ -93,6 +94,10 @@ fmt-check:
 
 ## Run the complete pre-commit verification suite
 check: fmt-check lint test build-frontend
+
+## Measure RAM consumption (USS, PSS, RSS) of running FerriVault and Bitwarden processes
+memory:
+	@./scripts/bench-memory.sh
 
 ## Clean frontend and Rust build outputs
 clean:
