@@ -8,7 +8,7 @@ use crate::crypto::kdf::KdfParams;
 use crate::error::AppError;
 
 const BITWARDEN_CLIENT_NAME: &str = "desktop";
-const BITWARDEN_CLIENT_VERSION: &str = "2024.12.0";
+const BITWARDEN_CLIENT_VERSION: &str = "2026.10.0";
 
 /// Request body sent to `POST /identity/accounts/prelogin`.
 #[derive(Debug, Serialize)]
@@ -28,6 +28,8 @@ struct BitwardenErrorModel {
 struct TokenErrorResponse {
     error: Option<String>,
     error_description: Option<String>,
+    #[serde(alias = "Message", alias = "message")]
+    message: Option<String>,
     #[serde(alias = "ErrorModel", alias = "errorModel")]
     error_model: Option<BitwardenErrorModel>,
     #[serde(alias = "TwoFactorProviders", alias = "twoFactorProviders")]
@@ -245,6 +247,12 @@ fn parse_token_failure(status: reqwest::StatusCode, raw_body: &str) -> AppError 
                 }
                 return AppError::InvalidCredentials(msg);
             }
+        }
+        if let Some(msg) = parsed.message {
+            if msg.to_ascii_lowercase().contains("new device") {
+                return AppError::NewDeviceVerificationRequired;
+            }
+            return AppError::InvalidCredentials(msg);
         }
         if let Some(desc) = parsed.error_description {
             return AppError::InvalidCredentials(desc);

@@ -104,7 +104,7 @@ impl AppState {
         );
         default_headers.insert(
             "Bitwarden-Client-Version",
-            reqwest::header::HeaderValue::from_static("2024.12.0"),
+            reqwest::header::HeaderValue::from_static("2026.10.0"),
         );
         default_headers.insert(
             "Device-Type",
@@ -112,7 +112,7 @@ impl AppState {
         );
 
         let http_client = Client::builder()
-            .user_agent("Mozilla/5.0 (X11; Linux x86_64) Bitwarden/2024.12.0")
+            .user_agent("Mozilla/5.0 (X11; Linux x86_64) Bitwarden/2026.10.0")
             .default_headers(default_headers)
             .build()
             .unwrap_or_else(|_| Client::new());

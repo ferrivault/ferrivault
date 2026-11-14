@@ -43,7 +43,7 @@ pub async fn fetch_sync(
     let response = client
         .get(&url)
         .header("Bitwarden-Client-Name", "desktop")
-        .header("Bitwarden-Client-Version", "2024.12.0")
+        .header("Bitwarden-Client-Version", "2026.10.0")
         .header("Device-Type", "8")
         .bearer_auth(access_token)
         .send()
