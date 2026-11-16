@@ -17,3 +17,11 @@ export interface TrayMenuLabels {
   lockVault: string;
   quit: string;
 }
+
+export interface UpdateCheckResult {
+  currentVersion: string;
+  latestVersion: string;
+  updateAvailable: boolean;
+  releaseUrl: string;
+  releaseName: string;
+}

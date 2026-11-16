@@ -18,6 +18,7 @@ import {
   XIcon,
 } from "@animateicons/react/lucide";
 import { SUPPORTED_LOCALES } from "../../i18n/config";
+import { apiOpenExternalUrl } from "../../lib/tauri";
 import {
   BUILTIN_THEMES,
   DEFAULT_THEME,
@@ -54,6 +55,9 @@ export const SettingsModal: React.FC = () => {
   const updateActiveThemeSizing = useSettingsStore(
     (s) => s.updateActiveThemeSizing
   );
+  const updateInfo = useSettingsStore((s) => s.updateInfo);
+  const isCheckingUpdates = useSettingsStore((s) => s.isCheckingUpdates);
+  const checkForUpdates = useSettingsStore((s) => s.checkForUpdates);
 
   const [activeTab, setActiveTab] = useState<SettingsTab>("security");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -734,17 +738,70 @@ export const SettingsModal: React.FC = () => {
                   </div>
                 </div>
 
-                {/* About */}
+                {/* About & Updates */}
                 <div className="rounded-xl border border-slate-800 bg-slate-950/60 p-4">
-                  <div className="mb-1.5 flex items-center gap-2 font-semibold text-slate-100">
-                    <InfoIcon size={16} className="text-brand-400" />
-                    <span>
-                      {t("settings.aboutSection")} ({t("app.version")})
-                    </span>
+                  <div className="mb-1.5 flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 font-semibold text-slate-100">
+                      <InfoIcon size={16} className="text-brand-400" />
+                      <span>
+                        {t("settings.aboutSection")} (
+                        {updateInfo
+                          ? `v${updateInfo.currentVersion}`
+                          : t("app.version")}
+                        )
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      disabled={isCheckingUpdates}
+                      onClick={() => {
+                        void checkForUpdates(false)
+                          .then((res) => {
+                            if (!res) return;
+                            if (res.updateAvailable) {
+                              pushToast(
+                                t("notifications.updateAvailable", {
+                                  version: res.latestVersion,
+                                }),
+                                "info"
+                              );
+                            } else {
+                              pushToast(t("notifications.upToDate"), "success");
+                            }
+                          })
+                          .catch(() => {
+                            pushToast(t("errors.networkError"), "error");
+                          });
+                      }}
+                      className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-[11px] font-medium text-slate-200 transition hover:border-brand-500 hover:text-white disabled:opacity-50"
+                    >
+                      {isCheckingUpdates
+                        ? t("settings.checkingUpdates")
+                        : t("settings.checkForUpdates")}
+                    </button>
                   </div>
                   <p className="text-[11px] leading-relaxed text-slate-400">
                     {t("settings.aboutDescription")}
                   </p>
+
+                  {updateInfo?.updateAvailable && (
+                    <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-brand-500/40 bg-brand-600/10 px-3 py-2">
+                      <span className="text-[11px] font-medium text-brand-300">
+                        {t("settings.updateAvailableLabel", {
+                          version: updateInfo.latestVersion,
+                        })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          void apiOpenExternalUrl(updateInfo.releaseUrl)
+                        }
+                        className="shrink-0 rounded-md bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-brand-500"
+                      >
+                        {t("settings.downloadUpdate")}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             )}

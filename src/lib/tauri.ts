@@ -1,6 +1,10 @@
 import { invoke } from "@tauri-apps/api/core";
 import type { AuthStatus, LoginPayload } from "../types/auth";
-import type { AppSettings, TrayMenuLabels } from "../types/settings";
+import type {
+  AppSettings,
+  TrayMenuLabels,
+  UpdateCheckResult,
+} from "../types/settings";
 import type {
   CipherView,
   FolderView,
@@ -140,4 +144,9 @@ export async function apiUpdateSettings(
 export async function apiSyncTrayLocale(labels: TrayMenuLabels): Promise<void> {
   if (!isTauriRuntime()) return;
   return invoke<void>("sync_tray_locale", { labels });
+}
+
+export async function apiCheckForUpdates(): Promise<UpdateCheckResult | null> {
+  if (!isTauriRuntime()) return null;
+  return invoke<UpdateCheckResult>("check_for_updates");
 }

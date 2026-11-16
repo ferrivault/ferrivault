@@ -257,7 +257,11 @@
     "startMinimizedLabel": "Start minimized in System Tray",
     "startMinimizedDesc": "Hide the main window on launch and keep FerriVault ready in the system tray.",
     "aboutSection": "About FerriVault",
-    "aboutDescription": "FerriVault is an open, memory-safe desktop client for Bitwarden and Vaultwarden powered by Tauri v2 and RustCrypto."
+    "aboutDescription": "FerriVault is an open, memory-safe desktop client for Bitwarden and Vaultwarden powered by Tauri v2 and RustCrypto.",
+    "checkForUpdates": "Check for Updates",
+    "checkingUpdates": "Checking...",
+    "updateAvailableLabel": "New version v{{version}} is available",
+    "downloadUpdate": "Download"
   },
   "tray": {
     "showWindow": "Show / Hide FerriVault",
@@ -277,7 +281,9 @@
     "folderSaved": "Folder saved",
     "folderDeleted": "Folder deleted",
     "vaultLocked": "Vault locked and keys wiped from memory",
-    "vaultAutoLocked": "Vault automatically locked due to inactivity"
+    "vaultAutoLocked": "Vault automatically locked due to inactivity",
+    "updateAvailable": "FerriVault v{{version}} is available on GitHub",
+    "upToDate": "You are running the latest version of FerriVault"
   },
   "errors": {
     "invalidCredentials": "Invalid email, master password, or verification code ({{message}}).",

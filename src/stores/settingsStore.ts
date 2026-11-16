@@ -5,6 +5,7 @@ import {
   setAppLocale,
 } from "../i18n/config";
 import {
+  apiCheckForUpdates,
   apiGetSettings,
   apiSyncTrayLocale,
   apiUpdateSettings,
@@ -16,7 +17,7 @@ import {
   DEFAULT_THEME,
   parseAndValidateThemeJson,
 } from "../lib/themes";
-import type { AppSettings } from "../types/settings";
+import type { AppSettings, UpdateCheckResult } from "../types/settings";
 import type { FerriVaultTheme, ThemeSizing } from "../types/theme";
 
 const LOCAL_SETTINGS_KEY = "ferrivault_settings";
@@ -77,6 +78,8 @@ function loadPersistedSettings(): AppSettings {
 
 interface SettingsState extends AppSettings {
   customThemes: FerriVaultTheme[];
+  updateInfo: UpdateCheckResult | null;
+  isCheckingUpdates: boolean;
   initializeSettings: () => Promise<void>;
   updateSettings: (partial: Partial<AppSettings>) => Promise<void>;
   changeLanguage: (code: string) => Promise<void>;
@@ -84,6 +87,7 @@ interface SettingsState extends AppSettings {
   importCustomTheme: (rawJson: string) => Promise<FerriVaultTheme>;
   deleteCustomTheme: (themeId: string) => Promise<void>;
   updateActiveThemeSizing: (sizing: Partial<ThemeSizing>) => Promise<void>;
+  checkForUpdates: (silent?: boolean) => Promise<UpdateCheckResult | null>;
 }
 
 const initialSettings = loadPersistedSettings();
@@ -92,6 +96,8 @@ const initialCustomThemes = parseCustomThemes(initialSettings.customThemesJson);
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   ...initialSettings,
   customThemes: initialCustomThemes,
+  updateInfo: null,
+  isCheckingUpdates: false,
 
   initializeSettings: async () => {
     let effective = loadPersistedSettings();
@@ -241,6 +247,22 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     } else {
       // Apply live to document for built-in theme preview
       applyThemeToDocument(active, updatedSizing);
+    }
+  },
+
+  checkForUpdates: async (silent = false) => {
+    if (!isTauriRuntime()) return null;
+    set({ isCheckingUpdates: true });
+    try {
+      const result = await apiCheckForUpdates();
+      set({ updateInfo: result, isCheckingUpdates: false });
+      return result;
+    } catch (err) {
+      set({ isCheckingUpdates: false });
+      if (!silent) {
+        throw err;
+      }
+      return null;
     }
   },
 }));

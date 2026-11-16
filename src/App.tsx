@@ -30,6 +30,7 @@ export default function App(): React.ReactElement {
 
   const initializeSettings = useSettingsStore((s) => s.initializeSettings);
   const autoLockMinutes = useSettingsStore((s) => s.autoLockMinutes);
+  const checkForUpdates = useSettingsStore((s) => s.checkForUpdates);
 
   const editingCipher = useVaultStore((s) => s.editingCipher);
   const toasts = useVaultStore((s) => s.toasts);
@@ -48,6 +49,30 @@ export default function App(): React.ReactElement {
     void initializeSettings();
     void checkStatus();
   }, [initializeSettings, checkStatus]);
+
+  // Periodic Update Check (3s after launch, then every 6 hours)
+  useEffect(() => {
+    if (!isTauriRuntime()) return;
+
+    const runCheck = () => {
+      void checkForUpdates(true).then((res) => {
+        if (res?.updateAvailable) {
+          pushToast(
+            t("notifications.updateAvailable", { version: res.latestVersion }),
+            "info"
+          );
+        }
+      });
+    };
+
+    const initialTimer = setTimeout(runCheck, 3000);
+    const intervalId = setInterval(runCheck, 6 * 60 * 60 * 1000);
+
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(intervalId);
+    };
+  }, [checkForUpdates, pushToast, t]);
 
   // Inactivity Auto-Lock Timer
   useEffect(() => {

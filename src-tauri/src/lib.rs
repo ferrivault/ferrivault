@@ -18,7 +18,7 @@ use tauri::{Manager, WindowEvent};
 
 use crate::commands::{
     auth_cmd::{get_auth_status, lock_vault, login, logout, unlock_vault},
-    settings_cmd::{get_settings, sync_tray_locale, update_settings},
+    settings_cmd::{check_for_updates, get_settings, sync_tray_locale, update_settings},
     tools_cmd::{
         copy_to_clipboard, generate_passphrase_cmd, generate_password_cmd, generate_totp_cmd,
         open_external_url,
@@ -158,6 +158,7 @@ pub fn run() {
             get_settings,
             update_settings,
             sync_tray_locale,
+            check_for_updates,
         ]);
 
     if let Err(err) = builder.run(tauri::generate_context!()) {

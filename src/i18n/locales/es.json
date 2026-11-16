@@ -257,7 +257,11 @@
     "startMinimizedLabel": "Iniciar minimizado en la bandeja del sistema",
     "startMinimizedDesc": "Oculta la ventana principal al arrancar y deja FerriVault listo en la bandeja del sistema.",
     "aboutSection": "Acerca de FerriVault",
-    "aboutDescription": "FerriVault es un cliente de escritorio libre y seguro en memoria para Bitwarden y Vaultwarden construido con Tauri v2 y RustCrypto."
+    "aboutDescription": "FerriVault es un cliente de escritorio libre y seguro en memoria para Bitwarden y Vaultwarden construido con Tauri v2 y RustCrypto.",
+    "checkForUpdates": "Buscar actualizaciones",
+    "checkingUpdates": "Comprobando...",
+    "updateAvailableLabel": "Nueva versión v{{version}} disponible",
+    "downloadUpdate": "Descargar"
   },
   "tray": {
     "showWindow": "Mostrar / Ocultar FerriVault",
@@ -277,7 +281,9 @@
     "folderSaved": "Carpeta guardada",
     "folderDeleted": "Carpeta eliminada",
     "vaultLocked": "Bóveda bloqueada y claves borradas de la memoria",
-    "vaultAutoLocked": "Bóveda bloqueada automáticamente por inactividad"
+    "vaultAutoLocked": "Bóveda bloqueada automáticamente por inactividad",
+    "updateAvailable": "FerriVault v{{version}} está disponible en GitHub",
+    "upToDate": "Ya tienes la última versión de FerriVault"
   },
   "errors": {
     "invalidCredentials": "Correo, contraseña maestra o código incorrectos ({{message}}).",

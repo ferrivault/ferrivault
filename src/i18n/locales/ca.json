@@ -257,7 +257,11 @@
     "startMinimizedLabel": "Inicia minimitzat a la safata del sistema",
     "startMinimizedDesc": "Amaga la finestra principal en arrencar i deixa FerriVault llest a la safata del sistema.",
     "aboutSection": "Quant a FerriVault",
-    "aboutDescription": "FerriVault és un client d'escriptori lliure i segur en memòria per a Bitwarden i Vaultwarden construït amb Tauri v2 i RustCrypto."
+    "aboutDescription": "FerriVault és un client d'escriptori lliure i segur en memòria per a Bitwarden i Vaultwarden construït amb Tauri v2 i RustCrypto.",
+    "checkForUpdates": "Cerca actualitzacions",
+    "checkingUpdates": "Comprovant...",
+    "updateAvailableLabel": "Nova versió v{{version}} disponible",
+    "downloadUpdate": "Descarrega"
   },
   "tray": {
     "showWindow": "Mostra / Amaga FerriVault",
@@ -277,7 +281,9 @@
     "folderSaved": "Carpeta desada",
     "folderDeleted": "Carpeta suprimida",
     "vaultLocked": "Caixa forta bloquejada i claus esborrades de la memòria",
-    "vaultAutoLocked": "Caixa forta bloquejada automàticament per inactivitat"
+    "vaultAutoLocked": "Caixa forta bloquejada automàticament per inactivitat",
+    "updateAvailable": "FerriVault v{{version}} està disponible a GitHub",
+    "upToDate": "Ja tens l'última versió de FerriVault"
   },
   "errors": {
     "invalidCredentials": "El correu, la contrasenya mestra o el codi són incorrectes ({{message}}).",
