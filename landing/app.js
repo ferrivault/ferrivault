@@ -97,6 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initToastSystem();
   initHeroLogoReplay();
   initOsDownloadDetector();
+  initLatestReleaseFetcher();
   initMockVaultSimulator();
   initImageLightbox();
   initAccessibleTabs();
@@ -142,18 +143,86 @@ function initToastSystem() {
 }
 
 /* ==========================================================================
-   Automatic OS Detection for Primary Download CTA
+   Automatic OS Detection for Primary Download CTA & Platform Highlight
    ========================================================================== */
 function initOsDownloadDetector() {
   const labelEl = document.getElementById("primary-os-label");
-  if (!labelEl) return;
   const ua = navigator.userAgent.toLowerCase();
+  let detectedOs = null;
+
   if (ua.includes("linux")) {
-    labelEl.textContent = "Download for Linux (.AppImage / .deb)";
+    detectedOs = "linux";
+    if (labelEl) labelEl.textContent = "Download for Linux (.AppImage / .deb / .rpm)";
   } else if (ua.includes("mac")) {
-    labelEl.textContent = "Download for macOS (Universal .dmg)";
+    detectedOs = "macos";
+    if (labelEl) labelEl.textContent = "Download for macOS (Apple Silicon / Intel)";
   } else if (ua.includes("win")) {
-    labelEl.textContent = "Download for Windows (.msi)";
+    detectedOs = "windows";
+    if (labelEl) labelEl.textContent = "Download for Windows (.msi / .exe)";
+  }
+
+  if (detectedOs) {
+    const card = document.querySelector(`[data-os-card="${detectedOs}"]`);
+    if (card) {
+      card.classList.add("is-current-os");
+      const pill = card.querySelector(".os-detected-pill");
+      if (pill) pill.hidden = false;
+    }
+  }
+}
+
+/* ==========================================================================
+   Auto-Update Version Badge & Direct Asset Links from GitHub Releases
+   ========================================================================== */
+async function initLatestReleaseFetcher() {
+  const heroVersionEl = document.getElementById("hero-version-text");
+  const downloadBadgeEl = document.getElementById("download-version-badge");
+  const allReleasesLink = document.getElementById("all-releases-link");
+
+  try {
+    const res = await fetch(
+      "https://api.github.com/repos/ferrivault/ferrivault/releases/latest",
+      { headers: { Accept: "application/vnd.github+json" } }
+    );
+    if (!res.ok) return;
+    const release = await res.json();
+    const tag = typeof release.tag_name === "string" ? release.tag_name.trim() : "";
+    if (!tag) return;
+
+    if (heroVersionEl) {
+      heroVersionEl.textContent = `${tag} Open Source (GPL-3.0) • Desktop GUI & Terminal CLI`;
+    }
+    if (downloadBadgeEl) {
+      downloadBadgeEl.textContent = `Latest Release: ${tag}`;
+    }
+    if (allReleasesLink && release.html_url) {
+      allReleasesLink.href = release.html_url;
+    }
+
+    const assets = Array.isArray(release.assets) ? release.assets : [];
+    const findAsset = (predicate) =>
+      assets.find((a) => typeof a.name === "string" && predicate(a.name.toLowerCase()));
+
+    const assetMap = {
+      "linux-appimage": findAsset((n) => n.endsWith(".appimage")),
+      "linux-deb": findAsset((n) => n.endsWith(".deb")),
+      "linux-rpm": findAsset((n) => n.endsWith(".rpm")),
+      "windows-msi": findAsset((n) => n.endsWith(".msi")),
+      "windows-exe": findAsset((n) => n.endsWith("-setup.exe") || n.endsWith(".exe")),
+      "macos-arm64": findAsset((n) => n.endsWith(".dmg") && (n.includes("aarch64") || n.includes("arm64"))),
+      "macos-x64": findAsset((n) => n.endsWith(".dmg") && (n.includes("x64") || n.includes("x86_64"))),
+    };
+
+    Object.entries(assetMap).forEach(([key, asset]) => {
+      const link = document.querySelector(`[data-release-asset="${key}"]`);
+      if (link && asset?.browser_download_url) {
+        link.href = asset.browser_download_url;
+      } else if (link && release.html_url) {
+        link.href = release.html_url;
+      }
+    });
+  } catch {
+    // Keep static fallback version & releases link when offline or rate-limited
   }
 }
 

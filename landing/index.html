@@ -26,10 +26,10 @@
 
         <nav class="nav-links" aria-label="Main navigation">
           <a href="#interactive-demo">Live Demo</a>
+          <a href="#download">Download</a>
           <a href="#screenshots">Screenshots</a>
-          <a href="#deep-dive">Architecture &amp; Tools</a>
+          <a href="#deep-dive">Architecture &amp; CLI</a>
           <a href="#features">Features</a>
-          <a href="#comparison">Why Rust + Tauri?</a>
         </nav>
 
         <div class="header-actions">
@@ -226,7 +226,7 @@
 
         <div class="hero-badge">
           <span class="badge-dot" aria-hidden="true"></span>
-          <span>v0.1.2 Open Source (GPL-3.0) • Built with Rust &amp; Tauri v2</span>
+          <span id="hero-version-text">v0.1.3 Open Source (GPL-3.0) • Desktop GUI &amp; Terminal CLI</span>
         </div>
 
         <h1 class="hero-title">
@@ -237,29 +237,31 @@
         <p class="hero-subtitle">
           FerriVault isolates every cryptographic key derivation, AES-256-CBC-HMAC
           decryption, live TOTP code, and clipboard wipe strictly inside a
-          memory-safe Rust backend—using a fraction of the RAM of Electron clients.
+          memory-safe Rust backend—available as a native desktop GUI and a
+          zero-overhead terminal CLI.
         </p>
 
         <div class="hero-cta-group">
           <a
-            href="https://github.com/ferrivault/ferrivault/releases"
+            id="primary-os-btn"
+            href="#download"
             class="btn btn-primary btn-lg"
           >
-            <span id="primary-os-label">Download FerriVault Desktop</span>
+            <span id="primary-os-label">Download FerriVault</span>
           </a>
           <button
             type="button"
             class="btn btn-secondary btn-lg"
-            data-copy-text="git clone https://github.com/ferrivault/ferrivault.git && cd ferrivault && make dev"
+            data-copy-text="ferrivault list --type login --json"
           >
-            <span>$ git clone &amp;&amp; make dev</span>
+            <span>$ ferrivault --help (CLI Mode)</span>
           </button>
         </div>
 
         <div class="hero-meta-strip">
           <span>✓ Official Bitwarden US / EU &amp; Self-Hosted Vaultwarden</span>
-          <span>✓ PBKDF2-SHA256 &amp; Argon2id + ZeroizeOnDrop</span>
-          <span>✓ Linux (Wayland/X11), macOS &amp; Windows</span>
+          <span>✓ Desktop GUI + Zero-Overhead Terminal CLI</span>
+          <span>✓ Linux, Windows &amp; macOS (Apple Silicon &amp; Intel)</span>
           <span>✓ English, Español &amp; Català</span>
         </div>
 
@@ -451,6 +453,144 @@
         </div>
       </section>
 
+      <!-- Multi-Platform Download Section -->
+      <section id="download" class="section container">
+        <div class="section-header">
+          <div class="section-eyebrow" id="download-version-badge">
+            Latest Release: v0.1.3
+          </div>
+          <h2 class="section-title">Download for Linux, Windows &amp; macOS</h2>
+          <p class="section-desc">
+            Every release includes both the native Tauri v2 desktop app and the
+            terminal CLI in a single lightweight binary. Links below update
+            automatically from GitHub Releases.
+          </p>
+        </div>
+
+        <div class="download-grid">
+          <!-- Linux -->
+          <article class="download-card scroll-reveal" data-os-card="linux">
+            <div class="download-card-head">
+              <div>
+                <h3>Linux <span class="arch-tag">x86_64</span></h3>
+                <p>Wayland &amp; X11 + ksni System Tray</p>
+              </div>
+              <span class="os-detected-pill" hidden>Your OS</span>
+            </div>
+            <div class="download-formats">
+              <a
+                data-release-asset="linux-appimage"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>.AppImage</strong> <small>Universal Portable</small></span>
+                <span>↓</span>
+              </a>
+              <a
+                data-release-asset="linux-deb"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>.deb</strong> <small>Debian / Ubuntu / Mint</small></span>
+                <span>↓</span>
+              </a>
+              <a
+                data-release-asset="linux-rpm"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>.rpm</strong> <small>Fedora / RHEL / openSUSE</small></span>
+                <span>↓</span>
+              </a>
+            </div>
+          </article>
+
+          <!-- Windows -->
+          <article class="download-card scroll-reveal" data-os-card="windows">
+            <div class="download-card-head">
+              <div>
+                <h3>Windows <span class="arch-tag">x86_64</span></h3>
+                <p>Windows 10 / 11 (WebView2 Native)</p>
+              </div>
+              <span class="os-detected-pill" hidden>Your OS</span>
+            </div>
+            <div class="download-formats">
+              <a
+                data-release-asset="windows-msi"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>.msi</strong> <small>Windows Installer</small></span>
+                <span>↓</span>
+              </a>
+              <a
+                data-release-asset="windows-exe"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>-setup.exe</strong> <small>NSIS Setup Executable</small></span>
+                <span>↓</span>
+              </a>
+            </div>
+            <p class="download-note">
+              Includes desktop GUI, autostart support, and CLI mode in your
+              installation directory.
+            </p>
+          </article>
+
+          <!-- macOS -->
+          <article class="download-card scroll-reveal" data-os-card="macos">
+            <div class="download-card-head">
+              <div>
+                <h3>macOS <span class="arch-tag">arm64 &amp; x64</span></h3>
+                <p>Apple Silicon &amp; Intel Macs</p>
+              </div>
+              <span class="os-detected-pill" hidden>Your OS</span>
+            </div>
+            <div class="download-formats">
+              <a
+                data-release-asset="macos-arm64"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>Apple Silicon (.dmg)</strong> <small>M1 / M2 / M3 / M4</small></span>
+                <span>↓</span>
+              </a>
+              <a
+                data-release-asset="macos-x64"
+                href="https://github.com/ferrivault/ferrivault/releases/latest"
+                class="download-format-btn"
+              >
+                <span><strong>Intel (.dmg)</strong> <small>x86_64 macOS</small></span>
+                <span>↓</span>
+              </a>
+            </div>
+            <div class="download-note">
+              Unsigned build: if Gatekeeper blocks first launch, run:
+              <button
+                type="button"
+                class="inline-copy-code"
+                data-copy-text="xattr -cr /Applications/FerriVault.app"
+              >
+                <code>xattr -cr /Applications/FerriVault.app</code>
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="download-all-link">
+          <a
+            id="all-releases-link"
+            href="https://github.com/ferrivault/ferrivault/releases"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-secondary"
+          >
+            View All Releases &amp; Checksums on GitHub →
+          </a>
+        </div>
+      </section>
+
       <!-- Dedicated Product Screenshots Section with Full-Size Lightbox -->
       <section id="screenshots" class="section container">
         <div class="section-header">
@@ -585,6 +725,15 @@
               aria-selected="false"
             >
               3. Theme Engine &amp; i18n
+            </button>
+            <button
+              type="button"
+              id="tab-cli"
+              class="tab-btn"
+              role="tab"
+              aria-selected="false"
+            >
+              4. Terminal CLI Mode
             </button>
           </div>
 
@@ -785,6 +934,87 @@
                     src="./assets/ferrivault-themes.jpg"
                     alt="FerriVault theme showcase across Cobalt, Emerald, Amber, and Daylight Clean"
                   />
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel 4: Terminal CLI Mode -->
+            <div
+              role="tabpanel"
+              aria-labelledby="tab-cli"
+              hidden="until-found"
+            >
+              <div class="tabpanel-card">
+                <div class="tabpanel-content">
+                  <h3>Full Terminal CLI in the Same Binary</h3>
+                  <p>
+                    Invoke <code>ferrivault</code> with any CLI subcommand to
+                    run directly in your terminal—without initializing GTK,
+                    WebKitGTK, or opening a GUI window. Ideal for SSH sessions,
+                    shell scripts, and CI/CD automation.
+                  </p>
+                  <ul class="feature-checklist">
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Script-Friendly Output:</strong> Query secrets
+                        with <code>--field password</code> or export structured
+                        arrays using <code>--json</code>.
+                      </span>
+                    </li>
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Live 2FA &amp; Generator:</strong> Fetch TOTP
+                        codes via <code>ferrivault totp github</code> or generate
+                        Diceware passphrases with
+                        <code>ferrivault generate --passphrase</code>.
+                      </span>
+                    </li>
+                    <li>
+                      <span class="check-icon">✓</span>
+                      <span>
+                        <strong>Non-Interactive Automation:</strong> Supports
+                        <code>FERRIVAULT_MASTER_PASSWORD</code> while reusing
+                        your encrypted local session.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="tabpanel-visual">
+                  <div class="cli-terminal-box">
+                    <div class="cli-terminal-bar">
+                      <span>bash — ferrivault CLI</span>
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        data-copy-text="ferrivault login --url https://vault.example.com --email you@example.com
+ferrivault sync
+ferrivault list --type login --json
+ferrivault get github --field password
+ferrivault totp github
+ferrivault generate --passphrase --words 5"
+                      >
+                        Copy Commands
+                      </button>
+                    </div>
+                    <pre class="cli-terminal-code"><code><span class="cli-dim"># Authenticate &amp; sync your encrypted vault</span>
+<span class="cli-prompt">$</span> ferrivault login --url https://vault.example.com
+<span class="cli-prompt">$</span> ferrivault sync
+
+<span class="cli-dim"># Search, inspect &amp; extract fields in scripts</span>
+<span class="cli-prompt">$</span> ferrivault list --type login --json
+<span class="cli-prompt">$</span> ferrivault get github --field password
+<span class="cli-ok">fv!9K#mP2$vL8@nQ4_xR7</span>
+
+<span class="cli-dim"># Generate live 2FA codes &amp; Diceware passphrases</span>
+<span class="cli-prompt">$</span> ferrivault totp github
+<span class="cli-ok">482910 (expires in 24s)</span>
+
+<span class="cli-prompt">$</span> ferrivault generate --passphrase --words 5
+<span class="cli-ok">Cobalt-Anvil-Cipher-Shield-Quartz</span></code></pre>
+                  </div>
                 </div>
               </div>
             </div>
